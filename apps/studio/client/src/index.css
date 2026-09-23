@@ -50,28 +50,30 @@
 }
 
 /*
- * Husk Studio — "ink on paper" monochrome.
+ * Husk Studio — "ink on paper" monochrome, light or dark.
  *
- * A deliberate black-and-white, editorial light theme: a debugger a non-engineer
- * PM can actually read, not a developer's dark trace console. Strictly monochrome — every hue
+ * A deliberate black-and-white, editorial theme: a debugger a non-engineer
+ * PM can actually read, not a developer's neon trace console. Strictly monochrome — every hue
  * is gone. Neutrals carry a whisper of cool slate (hue 264, chroma ~0.003) so the
  * paper reads crisp, not clinical. Severity is encoded by tone, weight, fill, and
- * inversion (a solid ink chip = error) rather than colour. OKLCH throughout;
- * chroma never exceeds 0.004, so nothing is ever truly coloured.
+ * inversion (a solid ink chip = error) rather than colour, in both modes: `--destructive`
+ * always equals `--foreground` and `--destructive-foreground` always equals `--background`,
+ * so "danger" is just the ink/paper relationship inverted. Chroma never exceeds 0.004 on
+ * neutrals, so nothing but the one accent is ever truly coloured.
  */
 :root {
   color-scheme: light;
   --radius: 0.625rem;
 
   /* "Brand" surface = ink (primary inverts: ink on paper). The one exception to
-     the monochrome rule is a single restrained azure accent for interactive and
+     the monochrome rule is a single restrained violet accent for interactive and
      brand moments (links, eyebrows, primary buttons, focus). Severity stays
-     monochrome: errors are still ink chips, never blue; charts stay grayscale. */
+     monochrome: errors are still ink chips, never colored; charts stay grayscale. */
   --primary: oklch(0.22 0.004 264);
   --primary-foreground: oklch(0.985 0.001 264);
-  --accent: oklch(0.56 0.14 245);
+  --accent: oklch(0.60 0.19 303);
   --accent-foreground: oklch(0.985 0.001 264);
-  --ring: oklch(0.56 0.14 245);
+  --ring: oklch(0.60 0.19 303);
 
   /* Paper → ink ramp */
   --background: oklch(0.985 0.001 264);
@@ -109,42 +111,45 @@
   --sidebar-ring: oklch(0.45 0.004 264);
 }
 
-/* Kept identical to :root so any forced `.dark` toggle still renders the one
- * professional monochrome theme rather than a broken half-dark surface. */
+/* Dark surface: the same ink-on-paper system with the paper turned dark and
+ * the ink turned light — `--primary`/`--destructive` still just alias
+ * `--foreground`/`--background` the same way they do in :root, so severity
+ * and inversion read identically in both modes. The accent is nudged a touch
+ * lighter than its light-mode value so it still pops against a dark paper. */
 .dark {
-  color-scheme: light;
-  --primary: oklch(0.22 0.004 264);
-  --primary-foreground: oklch(0.985 0.001 264);
-  --accent: oklch(0.56 0.14 245);
+  color-scheme: dark;
+  --primary: oklch(0.93 0.002 264);
+  --primary-foreground: oklch(0.17 0.004 264);
+  --accent: oklch(0.66 0.19 303);
   --accent-foreground: oklch(0.985 0.001 264);
-  --ring: oklch(0.56 0.14 245);
-  --background: oklch(0.985 0.001 264);
-  --foreground: oklch(0.22 0.004 264);
-  --card: oklch(0.998 0.0005 264);
-  --card-foreground: oklch(0.22 0.004 264);
-  --popover: oklch(0.998 0.0005 264);
-  --popover-foreground: oklch(0.22 0.004 264);
-  --secondary: oklch(0.955 0.0015 264);
-  --secondary-foreground: oklch(0.22 0.004 264);
-  --muted: oklch(0.945 0.002 264);
-  --muted-foreground: oklch(0.50 0.006 264);
-  --border: oklch(0.885 0.003 264);
-  --input: oklch(0.915 0.003 264);
-  --destructive: oklch(0.22 0.004 264);
-  --destructive-foreground: oklch(0.985 0.001 264);
-  --chart-1: oklch(0.22 0.004 264);
-  --chart-2: oklch(0.40 0.004 264);
-  --chart-3: oklch(0.56 0.004 264);
-  --chart-4: oklch(0.70 0.003 264);
-  --chart-5: oklch(0.82 0.003 264);
-  --sidebar: oklch(0.975 0.001 264);
-  --sidebar-foreground: oklch(0.22 0.004 264);
-  --sidebar-primary: oklch(0.22 0.004 264);
-  --sidebar-primary-foreground: oklch(0.985 0.001 264);
-  --sidebar-accent: oklch(0.22 0.004 264);
-  --sidebar-accent-foreground: oklch(0.985 0.001 264);
-  --sidebar-border: oklch(0.885 0.003 264);
-  --sidebar-ring: oklch(0.45 0.004 264);
+  --ring: oklch(0.66 0.19 303);
+  --background: oklch(0.17 0.004 264);
+  --foreground: oklch(0.93 0.002 264);
+  --card: oklch(0.21 0.004 264);
+  --card-foreground: oklch(0.93 0.002 264);
+  --popover: oklch(0.21 0.004 264);
+  --popover-foreground: oklch(0.93 0.002 264);
+  --secondary: oklch(0.24 0.004 264);
+  --secondary-foreground: oklch(0.93 0.002 264);
+  --muted: oklch(0.235 0.004 264);
+  --muted-foreground: oklch(0.64 0.006 264);
+  --border: oklch(0.30 0.006 264);
+  --input: oklch(0.32 0.006 264);
+  --destructive: oklch(0.93 0.002 264);
+  --destructive-foreground: oklch(0.17 0.004 264);
+  --chart-1: oklch(0.90 0.003 264);
+  --chart-2: oklch(0.75 0.003 264);
+  --chart-3: oklch(0.60 0.004 264);
+  --chart-4: oklch(0.46 0.004 264);
+  --chart-5: oklch(0.34 0.004 264);
+  --sidebar: oklch(0.19 0.004 264);
+  --sidebar-foreground: oklch(0.93 0.002 264);
+  --sidebar-primary: oklch(0.93 0.002 264);
+  --sidebar-primary-foreground: oklch(0.17 0.004 264);
+  --sidebar-accent: oklch(0.93 0.002 264);
+  --sidebar-accent-foreground: oklch(0.17 0.004 264);
+  --sidebar-border: oklch(0.30 0.006 264);
+  --sidebar-ring: oklch(0.55 0.006 264);
 }
 
 @layer base {
@@ -199,19 +204,6 @@
 
 @layer components {
   /**
-   * HUSK AI - Modern Tech-Forward Design System
-   * 
-   * Color Palette:
-   * - Background: #0F1117 (dark, GitHub-inspired)
-   * - Accent: #FF6B35 (vibrant orange)
-   * - Secondary: #21262D (subtle grey)
-   * - Text: #E6E6E6 (light grey)
-   * 
-   * Typography: Geist (modern, clean)
-   * Borders: Subtle, rounded corners
-   * Animations: Smooth, 300ms ease
-   * Layout: Clean, minimal, developer-focused
-   * 
    * Custom container utility that centers content and adds responsive padding.
    *
    * This overrides Tailwind's default container behavior to:

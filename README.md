@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/husk-logo.png" alt="husk-ai" width="120" />
+</p>
+
 <h1 align="center">husk-ai Studio</h1>
 
 <p align="center">

@@ -2,7 +2,9 @@
 // links center. Local-first single-user — no account menu, no project switcher.
 
 import { BrandMark } from "@/components/BrandMark";
-import { ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/lib/theme";
+import { ExternalLink, Moon, Sun } from "lucide-react";
 import { type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 
@@ -19,6 +21,7 @@ const NAV = [
 
 export function StudioLayout({ children }: StudioLayoutProps) {
   const [location] = useLocation();
+  const [theme, toggleTheme] = useTheme();
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -45,6 +48,15 @@ export function StudioLayout({ children }: StudioLayoutProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          >
+            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </Button>
           <span
             className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
             title="Husk debugs your agent during development. It runs only on this machine — never in production."

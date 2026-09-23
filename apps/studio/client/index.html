@@ -1,10 +1,24 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230F1117'/><text x='16' y='22' font-size='20' text-anchor='middle' fill='%23FF6B35' font-family='sans-serif' font-weight='bold'>H</text></svg>" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <title>Husk Studio</title>
+    <!-- Applied before paint so there's no flash of the wrong theme; must
+         agree with the storage key and fallback in src/lib/theme.ts. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("husk-theme");
+          var dark =
+            stored === "dark" ||
+            (stored !== "light" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

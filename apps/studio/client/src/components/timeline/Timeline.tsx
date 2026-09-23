@@ -4,6 +4,7 @@ import { ParentSize } from "@visx/responsive";
 import { scaleLinear } from "@visx/scale";
 
 import { fmtDuration, fmtTokens, type Span } from "@/lib/api";
+import { useTheme } from "@/lib/theme";
 
 interface TimelineProps {
   spans: Span[];
@@ -17,7 +18,13 @@ const PADDING_BOTTOM = 16;
 const LEFT_LABEL_WIDTH = 230;
 const BAR_HEIGHT = 14;
 
+const CHROME_LIGHT = { gridline: "#c4c5ca", selectedBar: "#26272c" };
+const CHROME_DARK = { gridline: "#3c3d45", selectedBar: "#f2f2f4" };
+
 export function Timeline({ spans, selectedId, onSelect }: TimelineProps) {
+  const [theme] = useTheme();
+  const CHROME = theme === "dark" ? CHROME_DARK : CHROME_LIGHT;
+
   if (spans.length === 0) {
     return (
       <div className="flex h-full items-center justify-center px-6 text-sm text-muted-foreground">
@@ -77,7 +84,7 @@ export function Timeline({ spans, selectedId, onSelect }: TimelineProps) {
                       y1={PADDING_TOP - 8}
                       x2={x}
                       y2={height - 6}
-                      stroke="#2E2A24"
+                      stroke={CHROME.gridline}
                       strokeWidth={1}
                       strokeDasharray="2 5"
                       opacity={0.6}
@@ -100,7 +107,7 @@ export function Timeline({ spans, selectedId, onSelect }: TimelineProps) {
                   LEFT_LABEL_WIDTH + timeScale(s.finished_at ?? s.started_at + 50);
                 const w = Math.max(x1 - x0, 4);
                 const selected = s.id === selectedId;
-                const fill = fillForKind(s.kind, s.status);
+                const fill = fillForKind(s.kind, s.status, theme);
                 return (
                   <g
                     key={s.id}
@@ -128,7 +135,7 @@ export function Timeline({ spans, selectedId, onSelect }: TimelineProps) {
                         height={ROW - 4}
                         rx={1.2}
                         ry={1.2}
-                        fill="#26272c"
+                        fill={CHROME.selectedBar}
                       />
                     )}
                     <text
@@ -186,17 +193,30 @@ export function Timeline({ spans, selectedId, onSelect }: TimelineProps) {
   );
 }
 
-function fillForKind(kind: string, status: string): { bg: string; stroke: string } {
+function fillForKind(
+  kind: string,
+  status: string,
+  theme: "light" | "dark",
+): { bg: string; stroke: string } {
+  if (theme === "dark") {
+    if (status === "error") return { bg: "#f2f2f4", stroke: "#f2f2f4" };
+    switch (kind) {
+      case "llm":
+        return { bg: "#9a9ba3", stroke: "#c8c9ce" };
+      case "tool":
+      case "chain":
+        return { bg: "#5a5b63", stroke: "#5a5b63" };
+      default:
+        return { bg: "#4a4b52", stroke: "#4a4b52" };
+    }
+  }
   if (status === "error") return { bg: "#26272c", stroke: "#26272c" };
   switch (kind) {
     case "llm":
       return { bg: "#8a8b91", stroke: "#55565c" };
     case "tool":
-      return { bg: "#c4c5ca", stroke: "#c4c5ca" };
     case "chain":
       return { bg: "#c4c5ca", stroke: "#c4c5ca" };
-    case "graph_node":
-      return { bg: "#bcbdc2", stroke: "#bcbdc2" };
     default:
       return { bg: "#bcbdc2", stroke: "#bcbdc2" };
   }
