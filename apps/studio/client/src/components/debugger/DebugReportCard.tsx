@@ -23,7 +23,7 @@ export function DebugReportCard({ runId, report, hasKey, onChanged }: DebugRepor
     setBusy(true);
     try {
       await analyzeRun(runId);
-      toast.success("Husk finished debugging this run");
+      toast.success("Husk Studio finished debugging this run");
       onChanged();
     } catch (e) {
       toast.error(`Analysis failed: ${String(e)}`);
@@ -42,7 +42,7 @@ export function DebugReportCard({ runId, report, hasKey, onChanged }: DebugRepor
         {hasKey ? (
           <>
             <p className="mb-2.5 text-[11px] leading-relaxed text-muted-foreground">
-              Click once and Husk debugs this run for you — it reads the whole run and
+              Click once and Husk Studio debugs this run for you — it reads the whole run and
               explains, in plain language, what went wrong and what to change.
             </p>
             <button
@@ -61,7 +61,7 @@ export function DebugReportCard({ runId, report, hasKey, onChanged }: DebugRepor
             <Link href="/settings" className="text-accent hover:underline">
               Settings
             </Link>{" "}
-            to let Husk debug your runs automatically (your key stays on this machine).
+            to let Husk Studio debug your runs automatically (your key stays on this machine).
           </p>
         )}
       </div>

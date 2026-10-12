@@ -3,7 +3,7 @@
 The load-bearing, genuinely-deterministic property behind the "100% replay
 success" and token-bypass claims: resuming a parent run at a fork node re-runs
 *exactly* that node and its successors, and nothing upstream. This exercises
-Husk's own engine (``husk_shared.engine``): it records a real run (canned LLM, no
+Husk's own engine (``husk_studio_shared.engine``): it records a real run (canned LLM, no
 API key) and asserts the replay's executed node
 set AND its child LLM-span count equal {fork} ∪ successors, with zero variance
 across repeats. It goes red the instant replay drifts (e.g. an off-by-one in the

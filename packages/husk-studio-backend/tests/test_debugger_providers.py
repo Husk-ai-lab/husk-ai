@@ -1,6 +1,6 @@
 """Provider abstraction: httpx call path via MockTransport, and key never logged.
 
-Mirrors packages/husk-sandbox/tests/test_cassette_sdk.py: a mock transport proves
+Mirrors packages/husk-studio-sandbox/tests/test_cassette_sdk.py: a mock transport proves
 the request shape without touching the network.
 """
 

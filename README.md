@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="assets/husk-logo.png" alt="husk-ai" width="120" />
+  <img src="assets/husk-studio-logo.png" alt="husk-studio" width="120" />
 </p>
 
-<h1 align="center">husk-ai Studio</h1>
+<h1 align="center">Husk Studio</h1>
 
 <p align="center">
-  <strong>Your agent does the wrong thing. husk-ai shows you why, in plain language, and lets you fix it before you ship.</strong><br />
+  <strong>Your agent does the wrong thing. Husk Studio shows you why, in plain language, and lets you fix it before you ship.</strong><br />
   A local, visual debugger for the agent you're building: what it did, what it cost, which
   model handled each step, and where it went wrong. No traces to read.
 </p>
@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/husk-ai-studio-dashboard.png" alt="The husk-ai Studio dashboard — what ran, and what broke" width="820" />
+  <img src="assets/husk-studio-dashboard.png" alt="The Husk Studio dashboard — what ran, and what broke" width="820" />
 </p>
 
 ---
@@ -58,15 +58,15 @@ refused at the door. Husk is not, and cannot be, production monitoring.
 ### Inside the Studio
 
 <p align="center">
-  <img src="assets/husk-ai-studio-runs.png" alt="husk-ai Studio — the runs list, with the model, status, duration, tokens, and cost of every run" width="820" />
+  <img src="assets/husk-studio-runs.png" alt="Husk Studio — the runs list, with the model, status, duration, tokens, and cost of every run" width="820" />
 </p>
 
 <p align="center">
-  <img src="assets/husk-ai-studio-run-detail.png" alt="husk-ai Studio — a single run as a node graph, with the per-node state diff and the replays forked from it" width="820" />
+  <img src="assets/husk-studio-run-detail.png" alt="Husk Studio — a single run as a node graph, with the per-node state diff and the replays forked from it" width="820" />
 </p>
 
 <p align="center">
-  <img src="assets/husk-ai-studio-replay.png" alt="husk-ai Studio — modify and replay: edit the state at any checkpoint and re-run from there" width="820" />
+  <img src="assets/husk-studio-replay.png" alt="Husk Studio — modify and replay: edit the state at any checkpoint and re-run from there" width="820" />
 </p>
 
 ## Quick start
@@ -74,15 +74,15 @@ refused at the door. Husk is not, and cannot be, production monitoring.
 ```bash
 git clone https://github.com/husk-ai-lab/husk-ai.git && cd husk-ai
 uv sync --all-packages
-uv run husk-ai start        # Studio at http://localhost:7654
-uv run husk-ai demo         # seed a sample run to look at
+uv run husk-studio start        # Studio at http://localhost:7654
+uv run husk-studio demo         # seed a sample run to look at
 ```
 
 Connect your own agent with one line of setup (any framework that speaks OpenTelemetry also
 just works):
 
 ```python
-from husk_shared import instrument_openai
+from husk_studio_shared import instrument_openai
 instrument_openai()         # every OpenAI SDK call now streams into Husk
 ```
 

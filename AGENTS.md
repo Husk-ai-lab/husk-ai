@@ -1,7 +1,7 @@
-# AGENTS.md — set up husk-ai, end to end
+# AGENTS.md — set up husk-studio, end to end
 
 **Read this first if you are an AI assistant.** This file is a runbook. Follow it top to bottom
-and the person you're helping ends with husk-ai running, a real run on screen, and their own
+and the person you're helping ends with husk-studio running, a real run on screen, and their own
 agent streaming into it.
 
 It is written so it works **even if you cannot run commands yourself**. You give the command,
@@ -31,7 +31,7 @@ and confirm before continuing. The checkpoints are exactly where setup goes wron
 
 - **Which OS?** Windows means PowerShell (not the old Command Prompt). macOS and Linux mean
   bash or zsh. Commands below are marked when they differ. Everything unmarked is identical.
-- **Docker or source?** If they just want to look at husk-ai and don't intend to change it,
+- **Docker or source?** If they just want to look at husk-studio and don't intend to change it,
   jump to [§10 Docker](#10-docker-the-no-clone-path) — it's one command. Everything else in
   this file assumes the source clone, which is what you want if they'll connect their own
   agent from the same machine.
@@ -40,7 +40,7 @@ Time budget: about 10 minutes, most of it waiting on one download.
 
 ---
 
-## 1. What husk-ai is, in four lines
+## 1. What husk-studio is, in four lines
 
 Describe it this way. Getting this wrong sends the user down the wrong path.
 
@@ -117,7 +117,7 @@ uv sync --all-packages
 
 **This takes 1 to 3 minutes and downloads roughly 700 MB** the first time — it fetches Python
 3.11 plus every dependency. It is not frozen. Tell the user that before they run it, or they
-will Ctrl+C a working install. After this, husk-ai runs fully offline.
+will Ctrl+C a working install. After this, husk-studio runs fully offline.
 
 **Looks right** — a resolved/installed summary ending with something like:
 
@@ -133,22 +133,22 @@ Everything from here runs from inside the `husk-ai` folder.
 ## 4. Checkpoint A — does it work at all?
 
 ```bash
-uv run husk-ai doctor
+uv run husk-studio doctor
 ```
 
 **Looks right** — five lines, then a next-steps block:
 
 ```
-husk: 0.8.0
+husk-studio: 0.8.0
 home: C:\Users\you\.husk
-db:   C:\Users\you\.husk\traces.db  missing (created on first `husk start`)
-mcp:  ready  connect with: husk-ai mcp
+db:   C:\Users\you\.husk\traces.db  missing (created on first `husk-studio start`)
+mcp:  ready  connect with: husk-studio mcp
       replay: disabled (read-only) (--enable-replay or HUSK_MCP_ENABLE_REPLAY=1; local-only)
 
 Next steps:
-  husk-ai start        backend + Studio
-  husk-ai demo         seed a sample run
-  husk-ai run <cmd>    capture your own agent
+  husk-studio start        backend + Studio
+  husk-studio demo         seed a sample run
+  husk-studio run <cmd>    capture your own agent
 ```
 
 How to read it:
@@ -168,13 +168,13 @@ it here using [§11](#11-when-it-breaks).
 ## 5. Start it
 
 ```bash
-uv run husk-ai start
+uv run husk-studio start
 ```
 
 **Looks right** — a log line with the URL, then uvicorn holding the terminal open:
 
 ```
-husk-ai starting on http://127.0.0.1:7654
+husk-studio starting on http://127.0.0.1:7654
 INFO:     Uvicorn running on http://127.0.0.1:7654 (Press CTRL+C to quit)
 ```
 
@@ -183,13 +183,13 @@ builds the Studio bundle — that adds 10 to 30 seconds once, then never again.
 
 Three things to tell the user, in this order:
 
-1. **Leave this terminal running.** Closing it stops husk-ai. `Ctrl + C` to stop on purpose.
+1. **Leave this terminal running.** Closing it stops husk-studio. `Ctrl + C` to stop on purpose.
    Everything from here needs a **second terminal**, `cd`'d into the same `husk-ai` folder.
-2. They land on **Welcome to husk-ai**. No account, no login, no sign-up — it is single-user
+2. They land on **Welcome to husk-studio**. No account, no login, no sign-up — it is single-user
    and runs only for them, on that machine. Click through to the empty run list.
-3. **Read the port off that log line, don't assume 7654.** If 7654 was busy, husk-ai silently
+3. **Read the port off that log line, don't assume 7654.** If 7654 was busy, husk-studio silently
    takes the next free port between 7655 and 7664 and writes the real one to `~/.husk/port`.
-   The URL in the log is the truth. To pin it: `uv run husk-ai start --port 7656`.
+   The URL in the log is the truth. To pin it: `uv run husk-studio start --port 7656`.
 
 > **Got a placeholder page saying the Studio isn't built yet?** Node is missing or the build
 > failed. See the Studio row in [§11](#11-when-it-breaks). The backend is fine — only the UI
@@ -202,7 +202,7 @@ Three things to tell the user, in this order:
 Second terminal, in the `husk-ai` folder:
 
 ```bash
-uv run husk-ai demo
+uv run husk-studio demo
 ```
 
 This writes one IDE event and a 3-span OpenTelemetry trace with GenAI attributes. Refresh the
@@ -219,14 +219,14 @@ port than the backend bound. Re-check the log line from §5.
 ## 7. Checkpoint C — the actual product
 
 `demo` only proves the plumbing. It emits a flat trace with no graph and no state, so the
-feature husk-ai exists for — edit a step and re-run from there — isn't visible yet. Do this
+feature husk-studio exists for — edit a step and re-run from there — isn't visible yet. Do this
 one. It takes fifteen seconds and it's the thing worth showing.
 
 ```bash
 uv run --group examples python examples/husk_thread.py
 ```
 
-This runs a real 2-node graph (`planner` → `answerer`) about "Rome" on husk-ai's own engine.
+This runs a real 2-node graph (`planner` → `answerer`) about "Rome" on husk-studio's own engine.
 
 **Looks right:**
 
@@ -248,14 +248,14 @@ Now walk them through the replay, in the Studio:
 `Tokyo is the capital of Japan with ~14M people.`
 
 **Then point at the `plan` field**, because it is the proof and it's easy to miss: it still
-reads `1. Research Rome`. `planner` never re-ran. husk-ai resumed from the state snapshot taken
+reads `1. Research Rome`. `planner` never re-ran. husk-studio resumed from the state snapshot taken
 *before* `answerer`, so only `answerer` executed — the upstream node emitted no spans, spent no
 tokens, and cost nothing. The original run is untouched; the new one is recorded as a branch
 off it. On a real agent that's the difference between re-running a 40-step pipeline and
 re-running the one step that broke.
 
 > **Modify and replay greyed out?** Expected on any run that arrived as pure OpenTelemetry
-> telemetry. husk-ai can only re-execute a run when it can reach the code that produced it. See
+> telemetry. husk-studio can only re-execute a run when it can reach the code that produced it. See
 > the two tiers in [docs/replay.md](docs/replay.md).
 
 ---
@@ -268,24 +268,24 @@ three and make them choose.
 **Decision rule:**
 
 - Python, using the OpenAI / Anthropic / LangChain / LangGraph / LlamaIndex SDK → **Path A**.
-- They'd rather not import husk-ai at all, or they're not on Python → **Path B**.
+- They'd rather not import husk-studio at all, or they're not on Python → **Path B**.
 - They already own a `TracerProvider` and want explicit control → **Path C**.
 
-Whichever path, the agent must run **on the same machine** as husk-ai. Ingest refuses
+Whichever path, the agent must run **on the same machine** as husk-studio. Ingest refuses
 non-loopback callers. There is no configuration that changes this.
 
 ### Path A — one line
 
 ```bash
-uv pip install 'husk-shared[openai]'
+uv pip install 'husk-studio-shared[openai]'
 ```
 
 Swap the extra for `anthropic`, `langgraph`, or `llamaindex` as needed.
 
 ```python
-from husk_shared import instrument_openai
+from husk_studio_shared import instrument_openai
 
-instrument_openai()   # every OpenAI SDK call now streams into husk-ai
+instrument_openai()   # every OpenAI SDK call now streams into husk-studio
 # ...then use the SDK exactly as before. Nothing else changes.
 ```
 
@@ -302,7 +302,7 @@ $env:OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:7654"; python your_agent.py
 ```
 
 Works with any OpenTelemetry SDK in any language that follows the GenAI semantic conventions.
-husk-ai appends `/v1/traces` itself.
+husk-studio appends `/v1/traces` itself.
 
 ### Path C — wire the exporter yourself
 
@@ -326,12 +326,12 @@ One command starts the backend if it isn't up, points the exporter at it, runs t
 prints the run URL:
 
 ```bash
-uv run husk-ai run python my_agent.py
+uv run husk-studio run python my_agent.py
 ```
 
 **Then verify.** Have them run their agent once and confirm the run lands under **Runs** with
-the fields they expect. husk-ai records exactly what the instrumentor emits — no more. If a
-prompt or token count is missing, the gap is upstream in the instrumentor, not in husk-ai. See
+the fields they expect. husk-studio records exactly what the instrumentor emits — no more. If a
+prompt or token count is missing, the gap is upstream in the instrumentor, not in husk-studio. See
 [docs/instrumentation.md](docs/instrumentation.md#a-note-on-capture).
 
 ---
@@ -342,12 +342,12 @@ Everything up to here works with no API key at all. These two are opt-in.
 
 ### The automatic debugger (needs a key)
 
-When a run fails, one click makes husk-ai read the whole run and explain, in plain language,
+When a run fails, one click makes husk-studio read the whole run and explain, in plain language,
 what broke and what to change. It needs a model provider key.
 
 **Hard rule: never ask the user to paste an API key into this chat.** Send them to the Studio's
 **Settings** page to enter it there. It is stored in `~/.husk/secrets.json` on their machine
-and is never logged, never returned to the UI, and never sent to any husk-ai server.
+and is never logged, never returned to the UI, and never sent to any husk-studio server.
 
 | Provider | Default? | Key via environment variable |
 |---|---|---|
@@ -356,20 +356,20 @@ and is never logged, never returned to the UI, and never sent to any husk-ai ser
 | OpenAI | | `OPENAI_API_KEY` |
 | OpenRouter | | **none — Settings only** |
 
-If they already have one of the first three exported in their shell, husk-ai picks it up and
+If they already have one of the first three exported in their shell, husk-studio picks it up and
 they can skip Settings. OpenRouter has no environment-variable fallback; its key must go
 through Settings.
 
-This is the only feature that sends anything off the machine. Skip it and husk-ai is fully
+This is the only feature that sends anything off the machine. Skip it and husk-studio is fully
 offline. Details: [docs/ai-layer.md](docs/ai-layer.md).
 
 ### MCP — let a coding assistant read the runs
 
-Connects husk-ai's local trace database to Claude Code, Cursor, Claude Desktop, or Windsurf, so
+Connects husk-studio's local trace database to Claude Code, Cursor, Claude Desktop, or Windsurf, so
 an assistant can answer "which of my last runs failed, and why?" directly.
 
 ```bash
-uv run husk-ai mcp install --client claude-code
+uv run husk-studio mcp install --client claude-code
 ```
 
 Also accepts `cursor`, `claude-desktop`, `windsurf` (each writes that client's config file) and
@@ -380,7 +380,7 @@ The read tools are `list_runs`, `get_run`, `get_trace`, `get_span`, `list_errors
 `~/.husk/traces.db` directly, so they work even when the backend isn't running.
 
 `replay_run` is **not** exposed by default. It executes the user's code. Only enable it if they
-ask, with `husk-ai mcp --enable-replay`.
+ask, with `husk-studio mcp --enable-replay`.
 
 Connecting the server isn't enough — the assistant also has to know to reach for it.
 [docs/mcp.md](docs/mcp.md#make-your-assistant-actually-use-them) has a ready-to-paste rules
@@ -390,7 +390,7 @@ block for exactly that.
 
 ## 10. Docker — the no-clone path
 
-For a user who wants to look at husk-ai without cloning or installing uv. They get the Studio
+For a user who wants to look at husk-studio without cloning or installing uv. They get the Studio
 and the CLI; they do **not** get the source, so they can't run the bundled examples against
 their own edits.
 
@@ -401,13 +401,13 @@ docker run -d --name husk -p 127.0.0.1:7654:7654 -v husk-data:/data ghcr.io/husk
 Then <http://localhost:7654>. Seed a run with:
 
 ```bash
-docker exec husk husk-ai demo
+docker exec husk husk-studio demo
 ```
 
 `docker compose up -d` works too — the compose file is in the repo root.
 
 **The catch worth stating up front:** ingest is loopback-only *relative to the container*. An
-agent running on the host cannot stream into a containerised husk-ai. If the user's whole point
+agent running on the host cannot stream into a containerised husk-studio. If the user's whole point
 is connecting their own agent, use the source path instead. Full details:
 [docs/docker.md](docs/docker.md).
 
@@ -426,14 +426,14 @@ Match on the **literal text** the user pastes. Don't guess.
 | `git : The term 'git' is not recognized` | same cause after the git installer | Close and reopen the terminal |
 | PowerShell refuses to run the install script | ExecutionPolicy | Use the install line **exactly** as written in §2 — its `-ExecutionPolicy ByPass` scopes to that one call. Do not change the system policy |
 | `uv sync` → `Failed to fetch …` | network or corporate proxy | Set `HTTPS_PROXY` and retry |
-| `uv sync` fine, but `husk-ai` "command not found" | sync ran outside the repo, or partially | `cd` into the repo root, re-run `uv sync --all-packages` |
+| `uv sync` fine, but `husk-studio` "command not found" | sync ran outside the repo, or partially | `cd` into the repo root, re-run `uv sync --all-packages` |
 | `ImportError: cannot import name 'StrEnum' from 'enum'` | venv predates the Python 3.11 pin | Delete `.venv` (`rm -rf .venv`, or `rmdir /s .venv` on Windows) and re-sync |
 
 ### Running, but wrong
 
 | What they see | Why | Fix |
 |---|---|---|
-| Browser: can't connect to localhost:7654 | port was taken, husk-ai bound elsewhere | Read the real URL off the `husk-ai starting on…` log line, or `cat ~/.husk/port`. Pin it with `--port 7656` |
+| Browser: can't connect to localhost:7654 | port was taken, husk-studio bound elsewhere | Read the real URL off the `husk-studio starting on…` log line, or `cat ~/.husk/port`. Pin it with `--port 7656` |
 | A page saying the Studio isn't built yet | Node missing, so the bundle couldn't auto-build | Install Node 20+ and restart. Or build by hand: `corepack pnpm install` then `corepack pnpm --filter studio build`, then reload |
 | Studio loads but can't reach the backend | dev server proxying to the wrong port | Check `VITE_BACKEND_PORT` in `apps/studio/.env.local` |
 | **Modify and replay** greyed out | that run has no graph module — expected for OTel-only runs | Not a bug. See [docs/replay.md](docs/replay.md) |
@@ -442,8 +442,8 @@ Match on the **literal text** the user pastes. Don't guess.
 
 | What they see | Why | Fix |
 |---|---|---|
-| Agent runs, nothing reaches husk-ai | agent isn't on this machine, or endpoint is wrong | Ingest is loopback-only **by design**. Point the exporter at `http://localhost:7654` and run the agent on the same machine. There is no remote-ingest option |
-| `AuthenticationError: Incorrect API key` | **their agent's** key, not husk-ai's | `$env:OPENAI_API_KEY = "sk-..."` (PowerShell) or `export OPENAI_API_KEY=sk-...` (bash). Never commit it |
+| Agent runs, nothing reaches husk-studio | agent isn't on this machine, or endpoint is wrong | Ingest is loopback-only **by design**. Point the exporter at `http://localhost:7654` and run the agent on the same machine. There is no remote-ingest option |
+| `AuthenticationError: Incorrect API key` | **their agent's** key, not husk-studio's | `$env:OPENAI_API_KEY = "sk-..."` (PowerShell) or `export OPENAI_API_KEY=sk-...` (bash). Never commit it |
 | `ModuleNotFoundError: No module named 'opentelemetry'` | OTel SDK missing in their project | `pip install opentelemetry-sdk opentelemetry-exporter-otlp-proto-http` |
 | Run appears, timeline empty | no root span | Wrap the top-level loop: `with tracer.start_as_current_span("agent.run"):` |
 | Run appears, prompts and completions missing | no `gen_ai.*` events | Add `span.add_event("gen_ai.user.message", {"content": prompt})` and `span.add_event("gen_ai.choice", {"message.content": completion})` |
@@ -451,11 +451,11 @@ Match on the **literal text** the user pastes. Don't guess.
 **Still stuck?** These two produce everything needed for a bug report:
 
 ```bash
-uv run husk-ai doctor
+uv run husk-studio doctor
 ```
 
 ```bash
-uv run husk-ai export <run_id>
+uv run husk-studio export <run_id>
 ```
 
 The export bundle is already secret-redacted, so it's safe to attach. Issues:
@@ -470,17 +470,17 @@ The export bundle is already secret-redacted, so it's safe to attach. Issues:
 
 | Command | What it does |
 |---|---|
-| `husk-ai start` | Boot the backend and Studio. `--port`, `--no-open-browser` |
-| `husk-ai run <cmd…>` | Start the backend if needed, point the agent at it, run it, print the run URL |
-| `husk-ai demo` | Seed a sample trace |
-| `husk-ai list` | Recent runs in the terminal |
-| `husk-ai replay <run_id>` | Replay from the terminal. `--set k=v`, `--span <id>`, `--cassette` |
-| `husk-ai export <run_id>` | Portable, secret-redacted JSON bundle. `--out FILE` |
-| `husk-ai doctor` | Version, paths, health check. Run this first when something's off |
-| `husk-ai delete <run_id>` | Drop one run. Prompts first; `--yes` skips. Prefer this over `clean` |
-| `husk-ai clean` | **Irreversible.** Wipes `~/.husk/`. Never run this for the user unasked |
-| `husk-ai mcp` | Run the MCP server. `--transport http` (port 7655), `--enable-replay` |
-| `husk-ai mcp install --client <name>` | Write a client's MCP config |
+| `husk-studio start` | Boot the backend and Studio. `--port`, `--no-open-browser` |
+| `husk-studio run <cmd…>` | Start the backend if needed, point the agent at it, run it, print the run URL |
+| `husk-studio demo` | Seed a sample trace |
+| `husk-studio list` | Recent runs in the terminal |
+| `husk-studio replay <run_id>` | Replay from the terminal. `--set k=v`, `--span <id>`, `--cassette` |
+| `husk-studio export <run_id>` | Portable, secret-redacted JSON bundle. `--out FILE` |
+| `husk-studio doctor` | Version, paths, health check. Run this first when something's off |
+| `husk-studio delete <run_id>` | Drop one run. Prompts first; `--yes` skips. Prefer this over `clean` |
+| `husk-studio clean` | **Irreversible.** Wipes `~/.husk/`. Never run this for the user unasked |
+| `husk-studio mcp` | Run the MCP server. `--transport http` (port 7655), `--enable-replay` |
+| `husk-studio mcp install --client <name>` | Write a client's MCP config |
 
 Prefix with `uv run` inside a source clone. Full reference: [docs/cli.md](docs/cli.md).
 
@@ -492,7 +492,7 @@ Prefix with `uv run` inside a source clone. Full reference: [docs/cli.md](docs/c
 | 7655 | MCP server, only with `--transport http` or `sse` |
 | 5174 | Vite dev server, only when developing the Studio UI |
 
-### Paths — everything husk-ai writes
+### Paths — everything husk-studio writes
 
 | Path | What |
 |---|---|
@@ -503,11 +503,11 @@ Prefix with `uv run` inside a source clone. Full reference: [docs/cli.md](docs/c
 | `~/.husk/port` | The port the running backend actually bound |
 | `<repo>/.venv/` | Python dependencies |
 
-To wipe everything: `uv run husk-ai clean`. To uninstall: delete the repo folder and `~/.husk/`.
+To wipe everything: `uv run husk-studio clean`. To uninstall: delete the repo folder and `~/.husk/`.
 
 ### Environment variables
 
-There is **no `.env` file and no `.env.example`** — husk-ai reads the environment directly.
+There is **no `.env` file and no `.env.example`** — husk-studio reads the environment directly.
 Don't invent one.
 
 | Variable | Effect |
@@ -529,10 +529,10 @@ Don't invent one.
   result. A made-up success message is worse than no message.
 - **Never ask for an API key in chat.** Settings page, or their own shell environment. Nowhere
   else.
-- **Never run `husk-ai clean` on your own initiative.** It irreversibly wipes every recorded
+- **Never run `husk-studio clean` on your own initiative.** It irreversibly wipes every recorded
   run.
 - **Don't enable `--enable-replay` casually.** It executes the user's code from an MCP tool.
-- **Don't offer to point husk-ai at staging or production.** Loopback-only ingest is enforced
+- **Don't offer to point husk-studio at staging or production.** Loopback-only ingest is enforced
   in code and is a deliberate product boundary, not a limitation to work around.
 - **One command at a time, and wait.** Every checkpoint in this file exists because that's
   where setups fail.
@@ -570,9 +570,9 @@ uv run python benchmark/reproduce.py
 Touched the Studio UI? Also `corepack pnpm --filter studio check` and
 `corepack pnpm --filter studio build`.
 
-Layout: `packages/` holds the four Python workspace packages (`husk-cli` ships the `husk-ai`
-command, `husk-shared` the schemas and replay engine, `husk-studio-backend` the FastAPI app,
-`husk-sandbox` the HTTP cassettes). `apps/studio/` is the React Studio. `packages-npm/` holds
+Layout: `packages/` holds the four Python workspace packages (`husk-studio-cli` ships the `husk-studio`
+command, `husk-studio-shared` the schemas and replay engine, `husk-studio-backend` the FastAPI app,
+`husk-studio-sandbox` the HTTP cassettes). `apps/studio/` is the React Studio. `packages-npm/` holds
 the Cursor and VS Code bridges. Architecture: [docs/architecture.md](docs/architecture.md).
 
 Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`). Contribution

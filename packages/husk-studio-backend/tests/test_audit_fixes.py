@@ -117,7 +117,7 @@ def test_redaction_covers_hyphenated_and_underscored_key_formats(secret: str) ->
 
 def test_span_attributes_are_redacted() -> None:
     """`attrs` skipped the redactor entirely, yet it is persisted, served over the
-    API, and included in `husk-ai export` — the bundle we tell users to attach to
+    API, and included in `husk-studio export` — the bundle we tell users to attach to
     bug reports."""
     secret = "sk-abcdefghij0123456789ABCDEFGH"
     spans = parse_otlp_traces(

@@ -59,7 +59,7 @@ export function StudioLayout({ children }: StudioLayoutProps) {
           </Button>
           <span
             className="inline-flex items-center gap-1.5 rounded-full border border-border/60 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-muted-foreground"
-            title="Husk debugs your agent during development. It runs only on this machine — never in production."
+            title="Husk Studio debugs your agent during development. It runs only on this machine — never in production."
           >
             <span className="inline-block size-1.5 rounded-full bg-accent" />
             <span className="hidden sm:inline">Development · local only</span>
@@ -76,7 +76,7 @@ export function StudioLayout({ children }: StudioLayoutProps) {
             <BrandMark className="opacity-70" />
             <span>
               Local-first development debugger. Your data never leaves this machine —
-              Husk runs while you build, never in production.
+              Husk Studio runs while you build, never in production.
             </span>
           </div>
           <a

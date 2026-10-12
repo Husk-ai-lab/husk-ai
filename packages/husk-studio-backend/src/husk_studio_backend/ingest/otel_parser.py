@@ -76,7 +76,7 @@ def _redact_attrs(attrs: dict[str, Any]) -> dict[str, Any]:
     """Redact span attributes, leaving Husk's own control attributes verbatim.
 
     Attributes are persisted, served over the API and WebSocket, and included in
-    `husk-ai export` — the bundle we tell people to attach to bug reports — so they
+    `husk-studio export` — the bundle we tell people to attach to bug reports — so they
     need the same scrub as prompts and completions. The `husk.` namespace is exempt
     because Husk sets those values itself and reads them back operationally
     (`husk.graph_module` is a filesystem path that replay must import); scrubbing a

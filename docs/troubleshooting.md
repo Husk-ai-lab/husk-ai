@@ -9,7 +9,7 @@ Find your symptom, apply the fix, get back to debugging your agent. Problems fal
 If you only have one minute, run the doctor first. It prints the installed version, your `~/.husk/` home, the database path, and a health check:
 
 ```bash
-uv run husk-ai doctor
+uv run husk-studio doctor
 ```
 
 For setup steps and connecting an agent, see the [Getting started](./getting-started.md) and [Instrumentation](./instrumentation.md) pages. Everything below is local and single-user: Husk runs on your machine, keeps zero data retention, and accepts traces only over loopback — so only an agent running on this same machine can stream in. The only outbound calls come from the automatic debugger reaching the model provider you configure.
@@ -26,7 +26,7 @@ These happen before Husk boots. Most are PATH problems after a fresh install: th
 | Install ran, `~/.local/bin/uv.exe` exists, still "not recognized" | Per-session fix in PowerShell: `$env:Path = "$HOME\.local\bin;" + $env:Path`. Permanent fix: open a new terminal. |
 | PowerShell cannot run script (ExecutionPolicy) | Use the install command exactly as written. It includes `-ExecutionPolicy ByPass`, which scopes the exception to that single invocation. Do not change your system policy. |
 | `uv sync` fails with "Failed to fetch …" | Network or proxy issue. Behind a corporate proxy, set `HTTPS_PROXY` and retry. |
-| `uv sync` succeeds but `uv run husk-ai start` says "command not found" | Re-run `uv sync --all-packages` from the repo root. The `husk-ai` script ships with the `husk-cli` workspace package. |
+| `uv sync` succeeds but `uv run husk-studio start` says "command not found" | Re-run `uv sync --all-packages` from the repo root. The `husk-studio` script ships with the `husk-studio-cli` workspace package. |
 | `ImportError: cannot import name 'StrEnum' from 'enum'` | Your venv predates the Python 3.11 pin. Delete and resync: `rmdir /s .venv` (PowerShell) or `rm -rf .venv` (mac/Linux), then `uv sync --all-packages`. |
 
 ## Runtime errors
@@ -35,8 +35,8 @@ The backend is up, but the Studio will not load or behaves oddly.
 
 | Symptom | Fix |
 | --- | --- |
-| Browser shows "can't connect to localhost:7654" | Backend crashed before binding. Check the terminal output. Most common cause: port 7654 is in use. Run `husk-ai start --port 7656` instead. |
-| Backend served a fallback "Studio isn't built yet" page | The Studio bundle is missing and auto-build was skipped, most likely because Node.js is not installed. Install Node 20+, then restart `uv run husk-ai start`. Or build manually: `corepack pnpm install` then `corepack pnpm --filter studio build` from the repo root, then reload the page. |
+| Browser shows "can't connect to localhost:7654" | Backend crashed before binding. Check the terminal output. Most common cause: port 7654 is in use. Run `husk-studio start --port 7656` instead. |
+| Backend served a fallback "Studio isn't built yet" page | The Studio bundle is missing and auto-build was skipped, most likely because Node.js is not installed. Install Node 20+, then restart `uv run husk-studio start`. Or build manually: `corepack pnpm install` then `corepack pnpm --filter studio build` from the repo root, then reload the page. |
 | Studio loads but cannot reach the backend (blank page, console connection errors) | The Studio dev server proxies to a different port. Check `VITE_BACKEND_PORT` in `apps/studio/.env.local`. |
 
 ## Agent connection errors
@@ -74,8 +74,8 @@ To uninstall everything Husk-related, delete the `husk-ai` repo folder (this rem
 Two fast diagnostics before you file anything:
 
 ```bash
-uv run husk-ai doctor              # version, home, DB path, health check
-uv run husk-ai export <run_id>     # portable, secret-redacted run bundle
+uv run husk-studio doctor              # version, home, DB path, health check
+uv run husk-studio export <run_id>     # portable, secret-redacted run bundle
 ```
 
 The `export` bundle (run, spans, and branches, already secret-redacted) is the single best attachment for a bug report: it captures the exact trajectory without leaking keys. If your symptom is not above, open an issue on [GitHub](https://github.com/husk-ai-lab/husk-ai/issues). For the full command set, see the [CLI reference](./cli.md), and start from the [README](../README.md) for the big picture.

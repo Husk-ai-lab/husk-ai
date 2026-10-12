@@ -18,9 +18,9 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from husk_shared.pricing import cost_usd
 from husk_studio_backend.db.engine import async_session
 from husk_studio_backend.db.models import BranchRow, RunRow, SpanRow
+from husk_studio_shared.pricing import cost_usd
 
 router = APIRouter(prefix="/api/v1/branches", tags=["branches"])
 log = logging.getLogger(__name__)

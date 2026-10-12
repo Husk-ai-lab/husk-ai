@@ -121,7 +121,7 @@ silent failure or crash.
 
 1. **The backend port is discovered, not assumed** — Electron waits for the Python process to
    announce its bound port, the same problem Husk's CLI already solves for the browser case via
-   `_resolve_port` (see [server.py](../packages/husk-cli/src/husk/server.py)).
+   `_resolve_port` (see [server.py](../packages/husk-studio-cli/src/husk/server.py)).
 2. **A boot handshake (spawn → health-check → probe) is load-bearing** and is exactly where
    Hermes's own bug reports cluster — worth designing explicit timeouts/error UI around, not an
    afterthought.

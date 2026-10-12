@@ -10,7 +10,7 @@ Not every run can be re-executed. Whether a recorded run can actually run again 
 
 | Tier | Applies to | What happens |
 |---|---|---|
-| **TRUE replay** | Runs on Husk's own engine ([`husk_shared.engine`](../packages/husk-shared/src/husk_shared/engine.py), see `examples/husk_thread.py`) | Husk re-executes the agent from a checkpoint with your edited state. New spans, new completions, a real new run. |
+| **TRUE replay** | Runs on Husk's own engine ([`husk_studio_shared.engine`](../packages/husk-studio-shared/src/husk_studio_shared/engine.py), see `examples/husk_thread.py`) | Husk re-executes the agent from a checkpoint with your edited state. New spans, new completions, a real new run. |
 | **VISUAL step-through** | Observability-only runs ingested over OpenTelemetry (no graph module) | Husk replays the recorded timeline so you can scrub through it. It cannot re-execute, because there is no code to call. |
 
 The rule is simple: Husk can re-execute a run only when it owns (or can re-import) the code that produced it. A run that arrived as pure OTel telemetry is a recording, not a program, so the most Husk can do is let you step through what already happened.
@@ -21,10 +21,10 @@ You can tell the tiers apart in the Studio: the **Modify and replay** button is 
 
 When your agent runs on Husk's own engine, every node writes a state snapshot before it executes. A replay resumes from the snapshot taken before the node you forked at and re-runs **only that node and its successors**. The upstream work is skipped, so it emits no spans and spends no tokens.
 
-The bundled example `examples/husk_thread.py` is built for exactly this. It is a 2-node graph (planner, then answerer) running on `husk_shared.engine`:
+The bundled example `examples/husk_thread.py` is built for exactly this. It is a 2-node graph (planner, then answerer) running on `husk_studio_shared.engine`:
 
 ```python
-from husk_shared.agent import HuskAgent
+from husk_studio_shared.agent import HuskAgent
 
 agent = HuskAgent("research")
 
@@ -51,7 +51,7 @@ This checkpoint-resume path is the one the [benchmark](../benchmark/README.md) m
 
 ### Re-invoke: the default for runs with a graph module
 
-A run does not have to be authored on `husk_shared.engine` to be re-executed. If the root span records a graph module (`husk.graph_module`), the Studio re-imports that file and runs it again with your edited state. This executes real code and, unless a cassette is used, makes real LLM and tool calls.
+A run does not have to be authored on `husk_studio_shared.engine` to be re-executed. If the root span records a graph module (`husk.graph_module`), the Studio re-imports that file and runs it again with your edited state. This executes real code and, unless a cassette is used, makes real LLM and tool calls.
 
 The difference from checkpoint-resume: re-invoke runs the graph from the top, so it does not skip upstream nodes. It is the broadest TRUE replay mode and works for any agent that exposes an `invoke(state, thread_id=None)` entry point and tags its root span with `husk.graph_module`.
 
@@ -85,17 +85,17 @@ HUSK_REPLAY_CASSETTE=1
 From the terminal or CI, the `--cassette` flag does the same:
 
 ```bash
-husk-ai replay <run_id> --cassette --set topic=Tokyo --span <node_id>
+husk-studio replay <run_id> --cassette --set topic=Tokyo --span <node_id>
 ```
 
 Without cassettes, a replay re-runs the downstream nodes against the live model. On the Husk engine this still bypasses the upstream token cost, it just pays for the nodes that actually re-execute.
 
 ## Replay from the CLI
 
-You do not need the Studio to replay. The `husk-ai replay` command runs a TRUE replay from the terminal or CI:
+You do not need the Studio to replay. The `husk-studio replay` command runs a TRUE replay from the terminal or CI:
 
 ```bash
-husk-ai replay <run_id> --set topic=Tokyo --span <node_id> --cassette
+husk-studio replay <run_id> --set topic=Tokyo --span <node_id> --cassette
 ```
 
 - `--set key=value` overrides state (value parsed as JSON, else treated as a string).

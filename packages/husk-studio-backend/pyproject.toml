@@ -5,7 +5,7 @@ description = "Husk Studio backend — FastAPI server with WebSocket trace strea
 requires-python = ">=3.11"
 license = { text = "BUSL-1.1" }
 dependencies = [
-    "husk-shared",
+    "husk-studio-shared",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "sqlalchemy[asyncio]>=2.0",

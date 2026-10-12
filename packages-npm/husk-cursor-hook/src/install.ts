@@ -35,6 +35,6 @@ export async function install(targetDir?: string): Promise<void> {
 
   writeFileSync(out, TEMPLATE, "utf8");
   process.stdout.write(
-    `Wrote ${out}\n\nNext:\n  1. Start Husk (in another terminal):  uv run husk-ai start\n  2. Open the Studio:  http://localhost:7654\n  3. Verify the bridge:  husk-cursor-hook ping\n  4. Open this project in Cursor — file edits and stop signals will stream into the Studio timeline.\n`,
+    `Wrote ${out}\n\nNext:\n  1. Start Husk (in another terminal):  uv run husk-studio start\n  2. Open the Studio:  http://localhost:7654\n  3. Verify the bridge:  husk-cursor-hook ping\n  4. Open this project in Cursor — file edits and stop signals will stream into the Studio timeline.\n`,
   );
 }

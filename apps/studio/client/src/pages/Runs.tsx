@@ -72,7 +72,7 @@ export default function Runs() {
             Runs
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Every agent run captured by Husk. Polling every 3s.
+            Every agent run captured by Husk Studio. Polling every 3s.
           </p>
         </div>
         {runs && (

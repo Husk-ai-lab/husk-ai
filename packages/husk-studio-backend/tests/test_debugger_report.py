@@ -150,9 +150,9 @@ async def test_analyze_rejects_malformed_model_output(
 
 @pytest.mark.asyncio
 async def test_debug_reports_table_created_version_unchanged(fresh_db: Path) -> None:
-    from husk_shared import RECORDING_FORMAT_VERSION
     from husk_studio_backend.config import husk_home
     from husk_studio_backend.db.engine import init_db, verify_recording_version
+    from husk_studio_shared import RECORDING_FORMAT_VERSION
 
     await init_db()
     # The debug_reports table is a pure additive table (no bump of its own); a

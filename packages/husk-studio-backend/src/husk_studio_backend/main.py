@@ -4,6 +4,7 @@ import logging
 import os
 import shutil
 import subprocess
+import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -43,12 +44,15 @@ def _find_studio_dist() -> Path | None:
       2. Relative to the workspace checkout: ../../../apps/studio/dist
          (used when running from a `uv sync` clone without a wheel).
     Returns the first path that has index.html, or None.
+
+    In a PyInstaller bundle only the first path applies: `__file__` is virtual
+    there, so the workspace path would resolve to wherever the binary happens to
+    sit and could serve a stray checkout's bundle instead of the baked-in one.
     """
     here = Path(__file__).resolve().parent
-    candidates = [
-        here / "studio_static",
-        here.parents[3] / "apps" / "studio" / "dist",
-    ]
+    candidates = [here / "studio_static"]
+    if not getattr(sys, "frozen", False):
+        candidates.append(here.parents[3] / "apps" / "studio" / "dist")
     for cand in candidates:
         if (cand / "index.html").is_file():
             return cand
@@ -69,6 +73,8 @@ def _ensure_studio_built() -> None:
     """
     if os.environ.get("HUSK_NO_AUTO_BUILD") == "1":
         return
+    if getattr(sys, "frozen", False):
+        return  # a frozen binary ships its bundle; it is never a workspace checkout
     if _find_studio_dist() is not None:
         return
 
@@ -106,7 +112,7 @@ def _ensure_studio_built() -> None:
             "Studio auto-build failed (exit %d). Serving landing page. "
             "Likely cause: missing node_modules. From the repo root run "
             "`corepack pnpm install && corepack pnpm --filter studio build` "
-            "then restart `husk-ai start`.",
+            "then restart `husk-studio start`.",
             exc.returncode,
         )
     except subprocess.TimeoutExpired:
@@ -122,7 +128,7 @@ def _ensure_studio_built() -> None:
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     await init_db()
     log.info(
-        "husk-ai is a local development debugger. It observes only the agent you run on this "
+        "husk-studio is a local development debugger. It observes only the agent you run on this "
         "machine (ingest is loopback-only) — never a production deployment elsewhere."
     )
     yield
@@ -178,15 +184,15 @@ _LANDING_HTML = """<!doctype html>
     <meta charset="utf-8" />
     <title>Husk - Studio not built yet</title>
     <style>
-      /* "Ink on paper" monochrome — same OKLCH tokens as the Studio (hue 264,
-         chroma <= 0.004). No tint: hierarchy is tone, the accent is ink. */
+      /* "Ink on paper" — same OKLCH tokens as the Studio (neutrals at hue 292, chroma
+         <= 0.02). Hierarchy is tone; the one chromatic note is the brand violet. */
       :root { color-scheme: light; }
       * { box-sizing: border-box; }
       body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
-        background: oklch(0.985 0.001 264);
-        color: oklch(0.22 0.004 264);
+        background: oklch(0.985 0.006 292);
+        color: oklch(0.22 0.006 292);
         min-height: 100vh;
         display: grid;
         place-items: center;
@@ -200,8 +206,8 @@ _LANDING_HTML = """<!doctype html>
         letter-spacing: -0.02em;
         font-weight: 700;
       }
-      .accent { color: oklch(0.22 0.004 264); }
-      .lead { color: oklch(0.50 0.006 264); margin: 0 0 2rem; font-size: 1rem; }
+      .accent { color: oklch(0.575 0.225 286); }
+      .lead { color: oklch(0.50 0.008 292); margin: 0 0 2rem; font-size: 1rem; }
       .grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -211,13 +217,13 @@ _LANDING_HTML = """<!doctype html>
         .grid { grid-template-columns: 1fr 1fr; }
       }
       .card {
-        border: 1px solid oklch(0.885 0.003 264);
-        background: oklch(0.998 0.0005 264);
+        border: 1px solid oklch(0.885 0.006 292);
+        background: oklch(0.998 0.006 292);
         padding: 1.5rem;
         border-radius: 12px;
         transition: border-color .2s;
       }
-      .card:hover { border-color: oklch(0.22 0.004 264 / 0.4); }
+      .card:hover { border-color: oklch(0.575 0.225 286 / 0.4); }
       .card h2 {
         margin: 0 0 0.25rem;
         font-size: 1.125rem;
@@ -226,13 +232,13 @@ _LANDING_HTML = """<!doctype html>
       .card .sub {
         margin: 0 0 1rem;
         font-size: 0.8125rem;
-        color: oklch(0.50 0.006 264);
+        color: oklch(0.50 0.008 292);
       }
       .eyebrow {
         font-size: 0.6875rem;
         text-transform: uppercase;
         letter-spacing: 0.18em;
-        color: oklch(0.22 0.004 264);
+        color: oklch(0.22 0.006 292);
         font-weight: 600;
         margin: 0 0 0.5rem;
       }
@@ -241,8 +247,8 @@ _LANDING_HTML = """<!doctype html>
         font-size: 0.8125rem;
       }
       pre {
-        background: oklch(0.955 0.0015 264);
-        border: 1px solid oklch(0.885 0.003 264);
+        background: oklch(0.955 0.006 292);
+        border: 1px solid oklch(0.885 0.006 292);
         border-radius: 6px;
         padding: 0.625rem 0.75rem;
         margin: 0.375rem 0;
@@ -250,24 +256,24 @@ _LANDING_HTML = """<!doctype html>
         white-space: pre-wrap;
         word-break: break-word;
       }
-      pre .prompt { color: oklch(0.50 0.006 264); user-select: none; }
+      pre .prompt { color: oklch(0.50 0.008 292); user-select: none; }
       .footer {
         margin-top: 2rem;
         padding-top: 1.25rem;
-        border-top: 1px solid oklch(0.885 0.003 264);
+        border-top: 1px solid oklch(0.885 0.006 292);
         font-size: 0.8125rem;
-        color: oklch(0.50 0.006 264);
+        color: oklch(0.50 0.008 292);
       }
-      a { color: oklch(0.22 0.004 264); text-decoration: none; }
+      a { color: oklch(0.575 0.225 286); text-decoration: none; }
       a:hover { text-decoration: underline; }
       .why {
         margin-top: 1.25rem;
         padding: 0.875rem 1rem;
         border-radius: 8px;
-        background: oklch(0.955 0.0015 264);
-        border: 1px solid oklch(0.885 0.003 264);
+        background: oklch(0.955 0.006 292);
+        border: 1px solid oklch(0.885 0.006 292);
         font-size: 0.8125rem;
-        color: oklch(0.50 0.006 264);
+        color: oklch(0.50 0.008 292);
       }
     </style>
   </head>
@@ -303,10 +309,10 @@ _LANDING_HTML = """<!doctype html>
       </div>
 
       <div class="why">
-        <strong style="color:oklch(0.22 0.004 264)">Why am I seeing this page?</strong>
+        <strong style="color:oklch(0.22 0.006 292)">Why am I seeing this page?</strong>
         Either (a) you cloned the repo and haven't built the Studio yet, OR
         (b) auto-build tried and failed (check the terminal where you ran
-        <code>husk-ai start</code> for the warning). Both options above need
+        <code>husk-studio start</code> for the warning). Both options above need
         Node.js 20+ and <code>corepack</code> enabled. See the
         <a href="https://github.com/husk-ai-lab/husk-ai#build-the-studio--run-a-dev-server">full guide</a>.
       </div>

@@ -1,16 +1,16 @@
 [project]
-name = "husk-workspace"
+name = "husk-studio-workspace"
 version = "0.8.1"
-description = "Husk monorepo workspace root — visual interactive debugger for AI agents"
+description = "Husk Studio monorepo workspace root — visual interactive debugger for AI agents"
 requires-python = ">=3.11"
 license = { text = "BUSL-1.1" }
 
 [tool.uv.workspace]
 members = [
-    "packages/husk-cli",
-    "packages/husk-sandbox",
+    "packages/husk-studio-cli",
+    "packages/husk-studio-sandbox",
     "packages/husk-studio-backend",
-    "packages/husk-shared",
+    "packages/husk-studio-shared",
 ]
 
 [tool.uv]
@@ -23,9 +23,9 @@ members = [
 python-preference = "managed"
 
 [tool.uv.sources]
-husk-sandbox = { workspace = true }
+husk-studio-sandbox = { workspace = true }
 husk-studio-backend = { workspace = true }
-husk-shared = { workspace = true }
+husk-studio-shared = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -35,6 +35,10 @@ dev = [
     "ruff>=0.7",
     "mypy>=1.13",
     "pre-commit>=4.0",
+]
+# Used only by packaging/build.py to freeze the standalone binary.
+build = [
+    "pyinstaller>=6.10",
 ]
 examples = [
     "opentelemetry-sdk>=1.27",
@@ -50,10 +54,10 @@ examples = [
 line-length = 100
 target-version = "py311"
 src = [
-    "packages/husk-cli/src",
-    "packages/husk-sandbox/src",
+    "packages/husk-studio-cli/src",
+    "packages/husk-studio-sandbox/src",
     "packages/husk-studio-backend/src",
-    "packages/husk-shared/src",
+    "packages/husk-studio-shared/src",
 ]
 
 [tool.ruff.lint]
@@ -63,6 +67,8 @@ ignore = ["E501"]
 [tool.ruff.lint.per-file-ignores]
 # Benchmark scripts are CLI utilities — `print` is the intended output channel.
 "benchmark/**" = ["T201"]
+# The binary build script is a CLI utility too.
+"packaging/**" = ["T201"]
 # This test must set env vars before importing the research graph (which reads
 # them at import time), so imports intentionally follow module-level statements.
 "benchmark/tests/test_determinism.py" = ["E402", "I001", "T201"]
@@ -71,6 +77,9 @@ ignore = ["E501"]
 asyncio_mode = "auto"
 testpaths = ["packages/*/tests", "benchmark/tests"]
 addopts = "--import-mode=importlib"
+markers = [
+    "binary: boots the PyInstaller-built husk-studio binary (run: pytest packaging/tests)",
+]
 
 [tool.mypy]
 python_version = "3.11"
@@ -79,15 +88,15 @@ ignore_missing_imports = true
 # Type-check the public library surface (package src). Tests and benchmark CLI
 # scripts are intentionally excluded from strict checking.
 files = [
-    "packages/husk-shared/src",
-    "packages/husk-sandbox/src",
+    "packages/husk-studio-shared/src",
+    "packages/husk-studio-sandbox/src",
     "packages/husk-studio-backend/src",
-    "packages/husk-cli/src",
+    "packages/husk-studio-cli/src",
 ]
 
 [[tool.mypy.overrides]]
 # The MCP SDK's @tool() decorator is untyped, which under strict makes every
 # decorated tool "untyped". The functions themselves are annotated; accept the
 # framework's untyped decorator here rather than littering type: ignore.
-module = "husk.mcp.server"
+module = "husk_studio.mcp.server"
 disallow_untyped_decorators = false

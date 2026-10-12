@@ -138,7 +138,7 @@ class HuskBridge {
         break;
       case "offline":
         this.status.text = "$(plug) Husk · offline";
-        this.status.tooltip = `Husk not reachable at ${huskUrl()}.\nStart it with: husk start`;
+        this.status.tooltip = `Husk not reachable at ${huskUrl()}.\nStart it with: husk-studio start`;
         this.status.backgroundColor = new vscode.ThemeColor(
           "statusBarItem.warningBackground",
         );

@@ -15,7 +15,7 @@ Flags:
   --realistic-timing    Override --fast: keep real ~24s/run latencies
   --regenerate          Re-generate topics + failure schedule first
 
-Prereq: Husk backend must be running.  `uv run husk-ai start` in another
+Prereq: Husk backend must be running.  `uv run husk-studio start` in another
 terminal. The benchmark itself stays offline (no real LLM, no real HTTP).
 """
 

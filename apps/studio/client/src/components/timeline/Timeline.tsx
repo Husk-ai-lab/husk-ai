@@ -18,8 +18,8 @@ const PADDING_BOTTOM = 16;
 const LEFT_LABEL_WIDTH = 230;
 const BAR_HEIGHT = 14;
 
-const CHROME_LIGHT = { gridline: "#c4c5ca", selectedBar: "#26272c" };
-const CHROME_DARK = { gridline: "#3c3d45", selectedBar: "#f2f2f4" };
+const CHROME_LIGHT = { gridline: "#c5c4cb", selectedBar: "#27262d" };
+const CHROME_DARK = { gridline: "#3e3c47", selectedBar: "#f2f2f6" };
 
 export function Timeline({ spans, selectedId, onSelect }: TimelineProps) {
   const [theme] = useTheme();
@@ -199,26 +199,26 @@ function fillForKind(
   theme: "light" | "dark",
 ): { bg: string; stroke: string } {
   if (theme === "dark") {
-    if (status === "error") return { bg: "#f2f2f4", stroke: "#f2f2f4" };
+    if (status === "error") return { bg: "#f2f2f6", stroke: "#f2f2f6" };
     switch (kind) {
       case "llm":
-        return { bg: "#9a9ba3", stroke: "#c8c9ce" };
+        return { bg: "#9c9aa5", stroke: "#c9c8cf" };
       case "tool":
       case "chain":
-        return { bg: "#5a5b63", stroke: "#5a5b63" };
+        return { bg: "#5c5a65", stroke: "#5c5a65" };
       default:
-        return { bg: "#4a4b52", stroke: "#4a4b52" };
+        return { bg: "#4b4a54", stroke: "#4b4a54" };
     }
   }
-  if (status === "error") return { bg: "#26272c", stroke: "#26272c" };
+  if (status === "error") return { bg: "#27262d", stroke: "#27262d" };
   switch (kind) {
     case "llm":
-      return { bg: "#8a8b91", stroke: "#55565c" };
+      return { bg: "#8b8a93", stroke: "#56555e" };
     case "tool":
     case "chain":
-      return { bg: "#c4c5ca", stroke: "#c4c5ca" };
+      return { bg: "#c5c4cb", stroke: "#c5c4cb" };
     default:
-      return { bg: "#bcbdc2", stroke: "#bcbdc2" };
+      return { bg: "#bdbcc3", stroke: "#bdbcc3" };
   }
 }
 

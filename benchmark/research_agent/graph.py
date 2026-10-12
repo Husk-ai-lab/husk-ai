@@ -1,6 +1,6 @@
 """Research Synthesizer -- 5-node pipeline on Husk's own engine.
 
-Resume substrate: this graph runs on Husk's own engine (``husk_shared.engine``):
+Resume substrate: this graph runs on Husk's own engine (``husk_studio_shared.engine``):
 a linear executor plus a local SQLite snapshot store. After each node a snapshot
 of the merged state is persisted; ``replay_from`` resumes a thread from the
 snapshot taken before the fork node and re-runs only that node and its
@@ -64,9 +64,9 @@ from benchmark.research_agent.mock_retrieve import (  # noqa: E402
 from benchmark.research_agent.mock_retrieve import (  # noqa: E402
     retrieve as mock_retrieve,
 )
-from husk_shared.engine import LinearExecutor, LinearGraph, SnapshotStore  # noqa: E402
-from husk_shared.pricing import cost_usd  # noqa: E402
-from husk_shared.state_diff import diff_states  # noqa: E402
+from husk_studio_shared.engine import LinearExecutor, LinearGraph, SnapshotStore  # noqa: E402
+from husk_studio_shared.pricing import cost_usd  # noqa: E402
+from husk_studio_shared.state_diff import diff_states  # noqa: E402
 
 log = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ def _cassette_session(thread_id: str, *, record: bool, replay: bool):
     if not (record or replay):
         yield
         return
-    from husk_sandbox import cassette  # lazy: keep the graph importable without the sandbox
+    from husk_studio_sandbox import cassette  # lazy: keep the graph importable without the sandbox
 
     with _cassette_lock:
         cm = (
@@ -773,7 +773,7 @@ def invoke(state: dict, thread_id: str | None = None) -> dict:
 # nodes are not re-run, so they emit no spans and consume no tokens -- that bypass
 # is the whole point of Husk.
 #
-# Mechanic (Husk's own engine, in husk_shared.engine): to RE-RUN node X we load
+# Mechanic (Husk's own engine, in husk_studio_shared.engine): to RE-RUN node X we load
 # the snapshot taken after X's PREDECESSOR (the state that was about to enter X in
 # the parent run), apply the patch, and run from X onward. For the first node the
 # predecessor is START, so there is no upstream snapshot and the patch seeds a

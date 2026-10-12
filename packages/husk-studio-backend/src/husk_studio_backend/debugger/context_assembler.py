@@ -4,7 +4,7 @@ Big traces overflow the context window, so we never send everything raw. The
 region around the failure is sent at full fidelity; far regions are summarized or
 (only if still over budget) dropped — noise far from the failure is cut first,
 the failure region never is. The budget is the selected model's context window
-(``husk_shared.model_metadata``) minus the model's own output reserve and the
+(``husk_studio_shared.model_metadata``) minus the model's own output reserve and the
 system prompt. Token counts use a cheap chars/4 heuristic (no extra deps).
 """
 
@@ -15,10 +15,10 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from husk_shared.model_metadata import context_window, max_output
 from husk_studio_backend.db.models import RunRow, SpanRow
 from husk_studio_backend.debugger.system_prompt import DEBUGGER_SYSTEM_PROMPT
 from husk_studio_backend.graph_model import NodeView, RunGraph, build_run_graph, node_dict
+from husk_studio_shared.model_metadata import context_window, max_output
 
 log = logging.getLogger(__name__)
 

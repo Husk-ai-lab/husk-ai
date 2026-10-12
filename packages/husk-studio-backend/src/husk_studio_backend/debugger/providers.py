@@ -3,11 +3,11 @@
 Pure ``httpx`` (already a dependency) so we control exactly what is sent and
 never log headers or bodies — no SDK that might log the key. Adding a provider is
 a small class + one registry entry. Each provider exposes the chosen model's
-context window via :mod:`husk_shared.model_metadata`, which the context assembler
+context window via :mod:`husk_studio_shared.model_metadata`, which the context assembler
 uses to size the budget.
 
 Tests inject ``transport=httpx.MockTransport(...)`` to exercise the call path
-without network, mirroring ``packages/husk-sandbox/tests/test_cassette_sdk.py``.
+without network, mirroring ``packages/husk-studio-sandbox/tests/test_cassette_sdk.py``.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from typing import Any, Protocol, runtime_checkable
 
 import httpx
 
-from husk_shared import model_metadata
+from husk_studio_shared import model_metadata
 
 log = logging.getLogger(__name__)
 

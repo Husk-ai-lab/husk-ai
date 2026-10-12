@@ -68,7 +68,7 @@ Across all branches: **183,108 tokens** bypassed out of **332,773** that would h
 
 ```bash
 uv run python benchmark/load_dataset.py --source triviaqa --n 1000
-uv run husk-ai start   # in another terminal
+uv run husk-studio start   # in another terminal
 $env:GROQ_API_KEY = '<your key>'
 BENCH_FAST=1 uv run --group examples python benchmark/run_benchmark.py \
     --runs 1000 --topics benchmark/queries_1000.jsonl --concurrency 6

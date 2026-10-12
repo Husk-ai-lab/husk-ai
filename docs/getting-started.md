@@ -31,21 +31,21 @@ Three commands, one at a time. Run them from a terminal opened *after* installin
 ```bash
 git clone https://github.com/husk-ai-lab/husk-ai.git && cd husk-ai
 uv sync --all-packages
-uv run husk-ai start
+uv run husk-studio start
 ```
 
-`uv sync` takes 1 to 3 minutes the first time (it fetches Python 3.11 if needed, plus dependencies). `uv run husk-ai start` boots the FastAPI backend, auto-builds the Studio bundle on first run (10 to 30 seconds, instant thereafter), and opens your browser at **http://localhost:7654**.
+`uv sync` takes 1 to 3 minutes the first time (it fetches Python 3.11 if needed, plus dependencies). `uv run husk-studio start` boots the FastAPI backend, auto-builds the Studio bundle on first run (10 to 30 seconds, instant thereafter), and opens your browser at **http://localhost:7654**.
 
 You land on the **Welcome to Husk** screen. There are no accounts or logins — Husk is single-user and runs only for you, on this machine. Click through to the run list, empty but ready.
 
-> **Leave that terminal running.** Closing it stops Husk. To stop on purpose, press `Ctrl + C`. To start again later, `cd` back into the folder and run `uv run husk-ai start`. Port 7654 already taken? Use `uv run husk-ai start --port 7656`.
+> **Leave that terminal running.** Closing it stops Husk. To stop on purpose, press `Ctrl + C`. To start again later, `cd` back into the folder and run `uv run husk-studio start`. Port 7654 already taken? Use `uv run husk-studio start --port 7656`.
 
 ## See a run right away
 
 The fastest way to confirm the pipeline works is to seed a sample trace.
 
 ```bash
-uv run husk-ai demo
+uv run husk-studio demo
 ```
 
 This writes a 3-span OpenTelemetry trace with GenAI attributes. Refresh the Studio: the run appears under **Runs** within a couple of seconds.
@@ -65,7 +65,7 @@ Husk works with any agent that speaks OpenTelemetry. Nothing core depends on a s
 Connecting an agent is the one setup touchpoint — a single line of SDK or OpenTelemetry config. Because ingest is loopback-only, this only works for an agent running on the same machine as Husk; an agent deployed on another host is refused by design. Add the line before your agent runs:
 
 ```python
-from husk_shared import instrument
+from husk_studio_shared import instrument
 
 instrument(service_name="my-agent")   # points OpenTelemetry at http://localhost:7654
 # now run your agent as usual. Husk picks up every span.
@@ -99,17 +99,17 @@ Each run shows up under **Runs** within about 2 seconds. Click into it to see th
 Want one command that starts the backend, points your agent at Husk, runs it, and prints the run URL? Use:
 
 ```bash
-uv run husk-ai run python my_agent.py
+uv run husk-studio run python my_agent.py
 ```
 
 ## Where things live
 
-All runtime data lives under `~/.husk/` on your machine: the SQLite trace database and (if you use the automatic debugger) your locally stored provider key. Nothing is retained anywhere else — the only outbound call is the automatic debugger reaching the BYOK model provider you choose (Regolo.ai by default: EU, GDPR, zero retention). To wipe it, run `uv run husk-ai clean`. To uninstall Husk, delete the cloned repo folder and `~/.husk/`.
+All runtime data lives under `~/.husk/` on your machine: the SQLite trace database and (if you use the automatic debugger) your locally stored provider key. Nothing is retained anywhere else — the only outbound call is the automatic debugger reaching the BYOK model provider you choose (Regolo.ai by default: EU, GDPR, zero retention). To wipe it, run `uv run husk-studio clean`. To uninstall Husk, delete the cloned repo folder and `~/.husk/`.
 
 ## Next steps
 
 - Stuck on install or a blank timeline? [Troubleshooting](./troubleshooting.md).
-- Every `husk-ai` command and flag: the [CLI reference](./cli.md).
+- Every `husk-studio` command and flag: the [CLI reference](./cli.md).
 - Streaming your editor's activity in too: the [Cursor bridge](../packages-npm/husk-cursor-hook/README.md) and the [VS Code bridge](../packages-npm/husk-vscode-hook/README.md).
 - Want an AI assistant to walk you through all of this instead? Hand it [AGENTS.md](../AGENTS.md).
-- New here? `uv run husk-ai doctor` prints your version, paths, and a health check when something feels off.
+- New here? `uv run husk-studio doctor` prints your version, paths, and a health check when something feels off.

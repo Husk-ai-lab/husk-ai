@@ -28,7 +28,7 @@ Your agent emits OpenTelemetry spans. That is the entire contract — and the si
 - One line with Husk's helper, which points OTel at the backend:
 
   ```python
-  from husk_shared import instrument
+  from husk_studio_shared import instrument
   instrument(service_name="my-agent")   # OTel -> http://localhost:7654
   ```
 
@@ -66,7 +66,7 @@ Nothing leaves this file except what you explicitly send: a replay you trigger, 
 OpenTelemetry's GenAI semantic conventions are the lingua franca that lets Husk read every framework the same way. On ingest, Husk maps incoming spans onto a normalized model:
 
 - `gen_ai.request.model` and `gen_ai.system` identify the model and provider for each step.
-- `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens` feed token and cost math (cost via the shared model cost table in `husk_shared`). This is what surfaces, within a single run, which model handled each step and what it cost.
+- `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens` feed token and cost math (cost via the shared model cost table in `husk_studio_shared`). This is what surfaces, within a single run, which model handled each step and what it cost.
 - `gen_ai.user.message` and `gen_ai.choice` events carry the actual prompt and completion text.
 - Husk's own `husk.*` attributes (`husk.node`, `husk.thread_id`, `husk.graph_module`) mark graph structure and the entry point replay needs.
 
@@ -74,7 +74,7 @@ Because the run reads this normalized shape, a CrewAI run and a LangGraph run an
 
 ## Husk's own checkpoint/replay engine
 
-Modify-and-replay runs on Husk's own engine, [`husk_shared.engine`](../packages/husk-shared/src/husk_shared/engine.py), not on LangGraph or any third-party graph runtime. It is a small, framework-agnostic executor plus a local SQLite snapshot store that Husk owns end to end:
+Modify-and-replay runs on Husk's own engine, [`husk_studio_shared.engine`](../packages/husk-studio-shared/src/husk_studio_shared/engine.py), not on LangGraph or any third-party graph runtime. It is a small, framework-agnostic executor plus a local SQLite snapshot store that Husk owns end to end:
 
 - A node is a plain callable: `(state) -> delta`. The executor runs nodes in order, merges each delta into a running state dict (last write wins), and writes a snapshot after every node, keyed by `(thread_id, node)`.
 - To replay node X with an edited state, the engine loads the snapshot taken after X's predecessor, applies your patch, and re-executes only X and its successors under a new thread id. The upstream nodes are never called, so they emit no spans and spend no tokens, and the parent run stays intact and can be re-forked.
@@ -97,7 +97,7 @@ Provider calls are made with plain `httpx` so Husk controls exactly what is sent
 
 ## The MCP server
 
-`husk-ai mcp` exposes Husk's read tools over the Model Context Protocol so another local agent can query your captured runs. Its read tools — for example `dashboard_summary` — open `~/.husk/traces.db` directly and reuse the exact same aggregation the HTTP backend serves, so they work even when the Studio backend is not running. Setup is documented in [docs/mcp.md](mcp.md).
+`husk-studio mcp` exposes Husk's read tools over the Model Context Protocol so another local agent can query your captured runs. Its read tools — for example `dashboard_summary` — open `~/.husk/traces.db` directly and reuse the exact same aggregation the HTTP backend serves, so they work even when the Studio backend is not running. Setup is documented in [docs/mcp.md](mcp.md).
 
 ## Why nothing core depends on a framework
 

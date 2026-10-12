@@ -1,7 +1,7 @@
 # Examples
 
 Runnable agent scripts used for development, manual testing, and CI smoke tests.
-Start Husk first (`uv run husk-ai start`), then run an example — each one emits
+Start Husk first (`uv run husk-studio start`), then run an example — each one emits
 traces into your local Studio at `http://localhost:7654`. Trace ingest is
 loopback-only, so these examples have to run on the same machine as Husk; that's
 the development-time debugger by design, not a production trace sink.

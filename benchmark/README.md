@@ -123,7 +123,7 @@ benchmark/
 
 ### Prereqs
 
-- Husk backend running locally (`uv run husk-ai start`)
+- Husk backend running locally (`uv run husk-studio start`)
 - `uv sync --all-packages --group examples` (OTel + provider SDK deps)
 
 ### Steps (current canonical pipeline)
@@ -136,7 +136,7 @@ uv run python benchmark/load_dataset.py --source triviaqa --n 500
 uv run python benchmark/inject_failures.py -n 500
 
 # 3. Start Husk backend in a separate terminal
-uv run husk-ai start
+uv run husk-studio start
 
 # 4. Set Groq API key (env var, never committed) and run the benchmark
 $env:GROQ_API_KEY = '<your-key>'  # PowerShell

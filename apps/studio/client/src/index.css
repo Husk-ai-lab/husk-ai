@@ -53,13 +53,14 @@
  * Husk Studio — "ink on paper" monochrome, light or dark.
  *
  * A deliberate black-and-white, editorial theme: a debugger a non-engineer
- * PM can actually read, not a developer's neon trace console. Strictly monochrome — every hue
- * is gone. Neutrals carry a whisper of cool slate (hue 264, chroma ~0.003) so the
- * paper reads crisp, not clinical. Severity is encoded by tone, weight, fill, and
- * inversion (a solid ink chip = error) rather than colour, in both modes: `--destructive`
- * always equals `--foreground` and `--destructive-foreground` always equals `--background`,
- * so "danger" is just the ink/paper relationship inverted. Chroma never exceeds 0.004 on
- * neutrals, so nothing but the one accent is ever truly coloured.
+ * PM can actually read, not a developer's neon trace console. Strictly monochrome
+ * apart from one violet accent. Neutrals carry a whisper of the brand violet (hue
+ * ~292, chroma <= 0.016, measured from the Husk Studio palette) so the paper reads
+ * crisp, not clinical. Severity is encoded by tone, weight, fill, and inversion
+ * (a solid ink chip = error) rather than colour, in both modes: `--destructive`
+ * always equals `--foreground` and `--destructive-foreground` always equals
+ * `--background`, so "danger" is just the ink/paper relationship inverted. Nothing
+ * but the one accent is ever truly coloured.
  */
 :root {
   color-scheme: light;
@@ -68,47 +69,47 @@
   /* "Brand" surface = ink (primary inverts: ink on paper). The one exception to
      the monochrome rule is a single restrained violet accent for interactive and
      brand moments (links, eyebrows, primary buttons, focus). Severity stays
-     monochrome: errors are still ink chips, never colored; charts stay grayscale. */
-  --primary: oklch(0.22 0.004 264);
-  --primary-foreground: oklch(0.985 0.001 264);
-  --accent: oklch(0.60 0.19 303);
-  --accent-foreground: oklch(0.985 0.001 264);
-  --ring: oklch(0.60 0.19 303);
+     monochrome: errors are still ink chips, never colored; charts stay tonal. */
+  --primary: oklch(0.196 0.014 292); /* #15141b */
+  --primary-foreground: oklch(1 0 0); /* #ffffff */
+  --accent: oklch(0.575 0.225 286); /* #7456f4 brand violet */
+  --accent-foreground: oklch(1 0 0); /* #ffffff */
+  --ring: oklch(0.575 0.225 286); /* #7456f4 */
 
-  /* Paper → ink ramp */
-  --background: oklch(0.985 0.001 264);
-  --foreground: oklch(0.22 0.004 264);
-  --card: oklch(0.998 0.0005 264);
-  --card-foreground: oklch(0.22 0.004 264);
-  --popover: oklch(0.998 0.0005 264);
-  --popover-foreground: oklch(0.22 0.004 264);
-  --secondary: oklch(0.955 0.0015 264);
-  --secondary-foreground: oklch(0.22 0.004 264);
-  --muted: oklch(0.945 0.002 264);
-  --muted-foreground: oklch(0.50 0.006 264);
-  --border: oklch(0.885 0.003 264);
-  --input: oklch(0.915 0.003 264);
+  /* Paper → ink ramp (PDF "light" theme) */
+  --background: oklch(0.969 0.005 298); /* #f5f4f8 */
+  --foreground: oklch(0.196 0.014 292); /* #15141b */
+  --card: oklch(1 0 0); /* #ffffff */
+  --card-foreground: oklch(0.196 0.014 292); /* #15141b */
+  --popover: oklch(1 0 0); /* #ffffff */
+  --popover-foreground: oklch(0.196 0.014 292); /* #15141b */
+  --secondary: oklch(0.952 0.009 293); /* #efeef5 */
+  --secondary-foreground: oklch(0.196 0.014 292); /* #15141b */
+  --muted: oklch(0.943 0.009 293); /* #ecebf2 */
+  --muted-foreground: oklch(0.511 0.016 290); /* #66656f */
+  --border: oklch(0.918 0.008 294); /* #e4e3e9 */
+  --input: oklch(0.882 0.011 292); /* #d8d7df */
 
   /* Semantic: mono. "Danger" is the darkest ink + inversion in components, not red. */
-  --destructive: oklch(0.22 0.004 264);
-  --destructive-foreground: oklch(0.985 0.001 264);
+  --destructive: oklch(0.196 0.014 292); /* #15141b */
+  --destructive-foreground: oklch(1 0 0); /* #ffffff */
 
-  /* Data viz: a pure grayscale ramp, light → dark. Series differ by tone, not hue. */
-  --chart-1: oklch(0.22 0.004 264);
-  --chart-2: oklch(0.40 0.004 264);
-  --chart-3: oklch(0.56 0.004 264);
-  --chart-4: oklch(0.70 0.003 264);
-  --chart-5: oklch(0.82 0.003 264);
+  /* Data viz: a tonal ramp, light → dark, in the palette's neutral hue. Series differ by tone. */
+  --chart-1: oklch(0.220 0.008 292);
+  --chart-2: oklch(0.400 0.008 292);
+  --chart-3: oklch(0.560 0.008 292);
+  --chart-4: oklch(0.700 0.006 292);
+  --chart-5: oklch(0.820 0.006 292);
 
-  /* Sidebar / chrome: a hair off the paper so the header reads as a distinct plane. */
-  --sidebar: oklch(0.975 0.001 264);
-  --sidebar-foreground: oklch(0.22 0.004 264);
-  --sidebar-primary: oklch(0.22 0.004 264);
-  --sidebar-primary-foreground: oklch(0.985 0.001 264);
-  --sidebar-accent: oklch(0.22 0.004 264);
-  --sidebar-accent-foreground: oklch(0.985 0.001 264);
-  --sidebar-border: oklch(0.885 0.003 264);
-  --sidebar-ring: oklch(0.45 0.004 264);
+  /* Sidebar / chrome: white against the lavender-gray page so the header reads as its own plane. */
+  --sidebar: oklch(1 0 0); /* #ffffff */
+  --sidebar-foreground: oklch(0.196 0.014 292); /* #15141b */
+  --sidebar-primary: oklch(0.196 0.014 292); /* #15141b */
+  --sidebar-primary-foreground: oklch(1 0 0); /* #ffffff */
+  --sidebar-accent: oklch(0.196 0.014 292); /* #15141b */
+  --sidebar-accent-foreground: oklch(1 0 0); /* #ffffff */
+  --sidebar-border: oklch(0.918 0.008 294); /* #e4e3e9 */
+  --sidebar-ring: oklch(0.450 0.010 292);
 }
 
 /* Dark surface: the same ink-on-paper system with the paper turned dark and
@@ -118,38 +119,38 @@
  * lighter than its light-mode value so it still pops against a dark paper. */
 .dark {
   color-scheme: dark;
-  --primary: oklch(0.93 0.002 264);
-  --primary-foreground: oklch(0.17 0.004 264);
-  --accent: oklch(0.66 0.19 303);
-  --accent-foreground: oklch(0.985 0.001 264);
-  --ring: oklch(0.66 0.19 303);
-  --background: oklch(0.17 0.004 264);
-  --foreground: oklch(0.93 0.002 264);
-  --card: oklch(0.21 0.004 264);
-  --card-foreground: oklch(0.93 0.002 264);
-  --popover: oklch(0.21 0.004 264);
-  --popover-foreground: oklch(0.93 0.002 264);
-  --secondary: oklch(0.24 0.004 264);
-  --secondary-foreground: oklch(0.93 0.002 264);
-  --muted: oklch(0.235 0.004 264);
-  --muted-foreground: oklch(0.64 0.006 264);
-  --border: oklch(0.30 0.006 264);
-  --input: oklch(0.32 0.006 264);
-  --destructive: oklch(0.93 0.002 264);
-  --destructive-foreground: oklch(0.17 0.004 264);
-  --chart-1: oklch(0.90 0.003 264);
-  --chart-2: oklch(0.75 0.003 264);
-  --chart-3: oklch(0.60 0.004 264);
-  --chart-4: oklch(0.46 0.004 264);
-  --chart-5: oklch(0.34 0.004 264);
-  --sidebar: oklch(0.19 0.004 264);
-  --sidebar-foreground: oklch(0.93 0.002 264);
-  --sidebar-primary: oklch(0.93 0.002 264);
-  --sidebar-primary-foreground: oklch(0.17 0.004 264);
-  --sidebar-accent: oklch(0.93 0.002 264);
-  --sidebar-accent-foreground: oklch(0.17 0.004 264);
-  --sidebar-border: oklch(0.30 0.006 264);
-  --sidebar-ring: oklch(0.55 0.006 264);
+  --primary: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --primary-foreground: oklch(0.177 0.012 293); /* #111016 */
+  --accent: oklch(0.645 0.202 288); /* #8c71ff brand violet */
+  --accent-foreground: oklch(1 0 0); /* #ffffff */
+  --ring: oklch(0.645 0.202 288); /* #8c71ff */
+  --background: oklch(0.177 0.012 293); /* #111016 */
+  --foreground: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --card: oklch(0.218 0.016 291); /* #1a1921 */
+  --card-foreground: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --popover: oklch(0.218 0.016 291); /* #1a1921 */
+  --popover-foreground: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --secondary: oklch(0.253 0.017 290); /* #22212a */
+  --secondary-foreground: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --muted: oklch(0.244 0.017 290); /* #201f28 */
+  --muted-foreground: oklch(0.676 0.022 292); /* #9795a4 */
+  --border: oklch(0.285 0.015 291); /* #2a2931 */
+  --input: oklch(0.326 0.016 291); /* #34333c */
+  --destructive: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --destructive-foreground: oklch(0.177 0.012 293); /* #111016 */
+  --chart-1: oklch(0.900 0.008 292);
+  --chart-2: oklch(0.750 0.008 292);
+  --chart-3: oklch(0.600 0.008 292);
+  --chart-4: oklch(0.460 0.008 292);
+  --chart-5: oklch(0.340 0.008 292);
+  --sidebar: oklch(0.195 0.012 293); /* #15141a */
+  --sidebar-foreground: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --sidebar-primary: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --sidebar-primary-foreground: oklch(0.177 0.012 293); /* #111016 */
+  --sidebar-accent: oklch(0.962 0.011 298); /* #f3f1f9 */
+  --sidebar-accent-foreground: oklch(0.177 0.012 293); /* #111016 */
+  --sidebar-border: oklch(0.285 0.015 291); /* #2a2931 */
+  --sidebar-ring: oklch(0.550 0.010 292);
 }
 
 @layer base {

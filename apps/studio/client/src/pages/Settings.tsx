@@ -150,8 +150,8 @@ export default function Settings() {
           Settings
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Connect the agent you're building, set up the automatic debugger, and see what Husk
-          keeps on this machine. Husk is a development tool — it runs on your machine while you
+          Connect the agent you're building, set up the automatic debugger, and see what Husk Studio
+          keeps on this machine. Husk Studio is a development tool — it runs on your machine while you
           build, never in production.
         </p>
       </div>
@@ -188,7 +188,7 @@ export default function Settings() {
       <section className="mb-10">
         <H2 icon={<Database className="size-3.5" />}>Database schema</H2>
         <p className="mb-4 text-sm text-muted-foreground">
-          Husk persists everything in a single SQLite file at{" "}
+          Husk Studio persists everything in a single SQLite file at{" "}
           <code className="rounded bg-secondary/40 px-1.5 py-0.5 font-mono text-xs text-foreground">
             ~/.husk/traces.db
           </code>
@@ -309,13 +309,13 @@ function DebuggerSettings() {
   return (
     <div className="rounded-xl border border-border/30 bg-secondary/10 p-5 md:p-6">
       <p className="mb-4 text-xs text-muted-foreground">
-        When a run fails, Husk debugs it for you: one click (or automatically) and it
+        When a run fails, Husk Studio debugs it for you: one click (or automatically) and it
         explains, in plain language, what went wrong and what to change. It uses a
         model you bring a key for. The key is stored locally in{" "}
         <code className="rounded bg-secondary/40 px-1.5 py-0.5 font-mono text-[11px]">
           ~/.husk/secrets.json
         </code>{" "}
-        and sent only from this machine straight to the provider: never to a Husk
+        and sent only from this machine straight to the provider: never to a Husk Studio
         server, never written into traces or exports.
       </p>
 
@@ -366,7 +366,7 @@ function DebuggerSettings() {
       <div className="mt-5 space-y-3">
         <ToggleRow
           label="Debug failed runs automatically"
-          hint="Husk debugs a run the moment it finishes in error — no click needed."
+          hint="Husk Studio debugs a run the moment it finishes in error — no click needed."
           checked={cfg.auto_analyze}
           onChange={(v) => patch({ auto_analyze: v })}
         />

@@ -42,7 +42,7 @@ if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
 from benchmark.bootstrap import bca_ci, wilson_ci  # noqa: E402
-from husk_shared.pricing import cost_usd  # noqa: E402
+from husk_studio_shared.pricing import cost_usd  # noqa: E402
 
 DB_PATH = Path.home() / ".husk" / "traces.db"
 
@@ -503,7 +503,7 @@ def render(data: dict, db_path: Path, since: int) -> str:
     lines.append("")
     lines.append("```bash")
     lines.append("uv run python benchmark/load_dataset.py --source triviaqa --n 1000")
-    lines.append("uv run husk-ai start   # in another terminal")
+    lines.append("uv run husk-studio start   # in another terminal")
     lines.append("$env:GROQ_API_KEY = '<your key>'")
     lines.append("BENCH_FAST=1 uv run --group examples python benchmark/run_benchmark.py \\")
     lines.append("    --runs 1000 --topics benchmark/queries_1000.jsonl --concurrency 6")

@@ -42,15 +42,15 @@ const STEPS: Record<
     title: "Your agent's SDK",
     icon: <PlugZap className="size-5" />,
     blurb:
-      "One line and every OpenAI, Anthropic, or LangGraph call your agent makes streams into Husk — token counts, tool calls, cost, and all.",
+      "One line and every OpenAI, Anthropic, or LangGraph call your agent makes streams into Husk Studio — token counts, tool calls, cost, and all.",
     snippets: [
       {
         label: "1. Install for your SDK",
-        cmd: "pip install 'husk-shared[openai]'   # or [anthropic] · [langgraph] · [llamaindex]",
+        cmd: "pip install 'husk-studio-shared[openai]'   # or [anthropic] · [langgraph] · [llamaindex]",
       },
       {
         label: "2. Add one line, then run your agent as usual",
-        cmd: "from husk_shared import instrument_openai; instrument_openai()",
+        cmd: "from husk_studio_shared import instrument_openai; instrument_openai()",
       },
     ],
     statusOf: (s) => s.otel,
@@ -59,7 +59,7 @@ const STEPS: Record<
     title: "Any framework (OTel)",
     icon: <Network className="size-5" />,
     blurb:
-      "Already emit OpenTelemetry? Point any GenAI emitter (AutoGen, OpenAI Agents SDK, LlamaIndex, Pydantic AI, CrewAI, SmolAgents, Vercel AI SDK) at Husk — no adapter needed.",
+      "Already emit OpenTelemetry? Point any GenAI emitter (AutoGen, OpenAI Agents SDK, LlamaIndex, Pydantic AI, CrewAI, SmolAgents, Vercel AI SDK) at Husk Studio — no adapter needed.",
     snippets: [
       {
         label: "OTLP endpoint",
@@ -72,7 +72,7 @@ const STEPS: Record<
     title: "Cursor",
     icon: <Terminal className="size-5" />,
     blurb:
-      "Stream Cursor's file edits and stop signals into Husk so the timeline shows every move your IDE agent makes.",
+      "Stream Cursor's file edits and stop signals into Husk Studio so the timeline shows every move your IDE agent makes.",
     snippets: [
       { label: "1. Install the bridge", cmd: "npm install -g husk-cursor-hook" },
       { label: "2. Generate hooks.json in your Cursor project", cmd: "husk-cursor-hook install" },
@@ -118,7 +118,7 @@ export default function Onboarding() {
           Wire your stack
         </h1>
         <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-          Connect the agent you're building. Husk observes it on this machine while you
+          Connect the agent you're building. Husk Studio observes it on this machine while you
           develop — never in production — and starts receiving events the moment you finish
           a setup.
         </p>

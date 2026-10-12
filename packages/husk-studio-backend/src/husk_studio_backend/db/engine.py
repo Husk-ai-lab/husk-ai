@@ -15,8 +15,8 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import Session, sessionmaker
 
-from husk_shared import RECORDING_FORMAT_VERSION, RecordingFormatError, check_format_version
 from husk_studio_backend.config import db_url, sync_db_url
+from husk_studio_shared import RECORDING_FORMAT_VERSION, RecordingFormatError, check_format_version
 
 _async_engine: AsyncEngine | None = None
 _sync_engine: Engine | None = None
@@ -161,7 +161,7 @@ def verify_recording_version(db_path: Path) -> int:
     Returns the effective recording version, or raises RecordingFormatError if
     the DB was written by a newer Husk. An unstamped DB (user_version 0) is
     treated as the current version (legacy DBs predate stamping but share the
-    v1 shape). Used by `husk-ai doctor` and tests.
+    v1 shape). Used by `husk-studio doctor` and tests.
     """
     con = sqlite3.connect(str(db_path))
     try:

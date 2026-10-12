@@ -22,7 +22,7 @@ another host.
    ```bash
    git clone https://github.com/husk-ai-lab/husk-ai.git && cd husk-ai
    uv sync --all-packages
-   uv run husk-ai start
+   uv run husk-studio start
    ```
 2. Install this extension in your IDE (VS Code, Cursor, Antigravity, …):
    ```bash
@@ -48,7 +48,7 @@ prompts you for a decision.
 
 | Setting | Default | What it does |
 |---|---|---|
-| `husk.url` | `http://localhost:7654` | Where to send events. Override if you ran `husk start --port <other>`. |
+| `husk.url` | `http://localhost:7654` | Where to send events. Override if you ran `husk-studio start --port <other>`. |
 | `husk.captureTerminal` | `true` | Toggle terminal capture. Use `Husk: Toggle Terminal Capture` from the command palette. |
 
 ## Commands

@@ -7,7 +7,7 @@ Development only — never production. Trace ingest is loopback-only, so only an
 Husk is framework-agnostic. It ingests the GenAI OpenTelemetry semantic conventions, so anything that speaks OTLP can connect. There are three ways in, from least to most wiring:
 
 1. **Generic OTLP** — point any OpenTelemetry GenAI emitter at Husk. No Husk code in your agent.
-2. **One-line SDK adapters** — `instrument_openai()`, `instrument_anthropic()`, and friends in `husk_shared`. One import, one call.
+2. **One-line SDK adapters** — `instrument_openai()`, `instrument_anthropic()`, and friends in `husk_studio_shared`. One import, one call.
 3. **Native-OTel frameworks** — CrewAI, Pydantic AI, Google ADK already emit OTLP. Set the endpoint and go.
 
 Nothing here depends on LangGraph. LangGraph is one adapter among many.
@@ -45,18 +45,18 @@ Prefer this path when you already emit OTel GenAI spans and just want your local
 
 ---
 
-## Path 2: One-line SDK adapters (`husk_shared`)
+## Path 2: One-line SDK adapters (`husk_studio_shared`)
 
 For Python SDKs, Husk ships thin adapters that set up the OTLP exporter and turn on the matching instrumentor in a single call. They are wrappers over the OpenInference instrumentors, which emit the GenAI-semconv spans Husk understands.
 
 Install the adapter you need as an extra, then call it before you use the SDK:
 
 ```bash
-pip install 'husk-shared[openai]'
+pip install 'husk-studio-shared[openai]'
 ```
 
 ```python
-from husk_shared import instrument_openai
+from husk_studio_shared import instrument_openai
 
 instrument_openai()   # every OpenAI SDK call now streams to Husk
 # ...then use the OpenAI SDK exactly as you normally would.
@@ -68,17 +68,17 @@ Available adapters:
 
 | Adapter | Install extra | Captures |
 | --- | --- | --- |
-| `instrument_openai()` | `husk-shared[openai]` | OpenAI Python SDK |
-| `instrument_anthropic()` | `husk-shared[anthropic]` | Anthropic Python SDK |
-| `instrument_langgraph()` | `husk-shared[langgraph]` | LangGraph / LangChain runs (graph node, LLM, and tool spans) |
-| `instrument_llamaindex()` | `husk-shared[llamaindex]` | LlamaIndex runs |
+| `instrument_openai()` | `husk-studio-shared[openai]` | OpenAI Python SDK |
+| `instrument_anthropic()` | `husk-studio-shared[anthropic]` | Anthropic Python SDK |
+| `instrument_langgraph()` | `husk-studio-shared[langgraph]` | LangGraph / LangChain runs (graph node, LLM, and tool spans) |
+| `instrument_llamaindex()` | `husk-studio-shared[llamaindex]` | LlamaIndex runs |
 
-The instrumentor packages are optional. Core `husk-shared` never imports them, so an agent that only uses the schemas or engine pays nothing for them. If an extra is missing, the adapter raises a clear install hint instead of a cryptic `ImportError`.
+The instrumentor packages are optional. Core `husk-studio-shared` never imports them, so an agent that only uses the schemas or engine pays nothing for them. If an extra is missing, the adapter raises a clear install hint instead of a cryptic `ImportError`.
 
 Each adapter takes an optional `service_name` (how the agent is labeled in the Studio) and an optional `endpoint`:
 
 ```python
-from husk_shared import instrument_anthropic
+from husk_studio_shared import instrument_anthropic
 
 instrument_anthropic(service_name="support-bot", endpoint="http://localhost:7654")
 ```

@@ -113,6 +113,10 @@ my-video/
 # Internal docs not meant for the public repo
 /*.pdf
 
+# Local-only generated architecture reference (exhaustive file-level dump,
+# not meant for the public repo — see docs/architecture.md instead).
+/docs/SYSTEM_OVERVIEW.md
+
 # Enterprise edition (team / multi-tenant) — extracted from the public product,
 # kept locally for a future private edition, never committed to the public repo.
 /enterprise/
@@ -127,3 +131,6 @@ my-video/
 /.agents/
 /skills-lock.json
 
+
+# PyInstaller build environment (packaging/build.py)
+.venv-build/

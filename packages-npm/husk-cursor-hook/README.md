@@ -38,7 +38,7 @@ Then start Husk:
 # Install from source (PyPI release is on the roadmap)
 git clone https://github.com/husk-ai-lab/husk-ai.git && cd husk-ai
 uv sync --all-packages
-uv run husk-ai start
+uv run husk-studio start
 ```
 
 Open `http://localhost:7654` to see the Studio.

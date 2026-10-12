@@ -58,9 +58,9 @@ export default function Dashboard() {
           What ran, <span className="text-accent italic">and what broke</span>.
         </h1>
         <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl">
-          Husk debugs the agent you're building, before it ships. See every run — what it
+          Husk Studio debugs the agent you're building, before it ships. See every run — what it
           did, what it cost, which model handled each step — and when something breaks, one
-          click and Husk debugs it for you, in plain language. Local only, never production.
+          click and Husk Studio debugs it for you, in plain language. Local only, never production.
         </p>
       </div>
 

@@ -27,7 +27,7 @@ _REPO_ROOT = str(Path(__file__).resolve().parents[1])
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-from husk_shared import RECORDING_FORMAT_VERSION  # noqa: E402
+from husk_studio_shared import RECORDING_FORMAT_VERSION  # noqa: E402
 
 DEFAULT_DB = Path.home() / ".husk" / "traces.db"
 DEFAULT_OUT = Path(__file__).resolve().parent / "fixtures" / "canonical_run"

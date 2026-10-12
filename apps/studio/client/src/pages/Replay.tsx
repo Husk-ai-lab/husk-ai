@@ -175,7 +175,7 @@ export default function Replay() {
         <div className="mb-6 rounded-lg border border-border bg-secondary/50 px-4 py-3 text-sm text-muted-foreground">
           This run is observability-only — no{" "}
           <code className="font-mono text-xs">husk.graph_module</code> was recorded, so it
-          can&apos;t be replayed. Replay works on agents running on Husk&apos;s own engine (see{" "}
+          can&apos;t be replayed. Replay works on agents running on Husk Studio&apos;s own engine (see{" "}
           <code className="font-mono text-xs">examples/husk_thread.py</code>).
         </div>
       )}

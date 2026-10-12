@@ -98,7 +98,7 @@ async def run_debug_analysis(
     user_content = json.dumps(context, default=str)
 
     prov = providers.get_provider(provider_name)
-    from husk_shared.model_metadata import max_output
+    from husk_studio_shared.model_metadata import max_output
 
     try:
         # Provider call is blocking httpx; keep the event loop free.

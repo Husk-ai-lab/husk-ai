@@ -74,7 +74,7 @@ async def get_run(run_id: str) -> dict[str, Any]:
 async def delete_run(run_id: str) -> None:
     """Delete one run and everything attached to it.
 
-    Until this existed the only way to remove a run was `husk-ai clean`, which wipes
+    Until this existed the only way to remove a run was `husk-studio clean`, which wipes
     the entire database — too blunt when one noisy run is in the way. Deleting is
     destructive, so unlike the read routes this one sits behind the loopback guard.
 

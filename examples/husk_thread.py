@@ -24,7 +24,7 @@ import time
 
 from opentelemetry import trace
 
-from husk_shared.agent import HuskAgent
+from husk_studio_shared.agent import HuskAgent
 
 log = logging.getLogger(__name__)
 

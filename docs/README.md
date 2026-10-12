@@ -31,7 +31,7 @@ is not, and cannot be, production monitoring.
 - [Docker](./docker.md) — run with Docker and docker compose.
 - [Security & data](./security.md) — the loopback model; what stays on your machine and what leaves it.
 - [Architecture](./architecture.md) — how the pieces fit.
-- [CLI](./cli.md) — the `husk-ai` command reference.
+- [CLI](./cli.md) — the `husk-studio` command reference.
 
 ## Reference
 

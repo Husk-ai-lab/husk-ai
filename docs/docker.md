@@ -21,14 +21,14 @@ docker run -d --name husk -p 127.0.0.1:7654:7654 -v husk-data:/data ghcr.io/husk
 Open **http://localhost:7654**. Then seed a sample run to look at right away:
 
 ```bash
-docker exec husk husk-ai demo
+docker exec husk husk-studio demo
 ```
 
 To see the **node graph + per-node state diff** (the `demo` trace is flat, not a graph), run the bundled example agent on the container's loopback:
 
 ```bash
 docker exec husk sh -c \
-  'OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:7654 husk-ai run python examples/husk_thread.py'
+  'OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:7654 husk-studio run python examples/husk_thread.py'
 ```
 
 ## Connecting your own agent
@@ -37,7 +37,7 @@ Wiring an agent to Husk is one line: point its OpenTelemetry exporter at the con
 
 ```bash
 docker exec husk sh -c \
-  'OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:7654 husk-ai run python your_agent.py'
+  'OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:7654 husk-studio run python your_agent.py'
 ```
 
 That one-line OpenTelemetry setup is the single touchpoint between your agent and Husk; everything else stays the same code you already have.

@@ -13,13 +13,13 @@ serves both the API and the built UI on one port, and the OS's own browser is th
 of that API — the same trust model as any local web app.
 
 ```
-uv run husk-ai start
+uv run husk-studio start
       │
       ▼
-husk.cli:main()  (Click group, entry point from packages/husk-cli/pyproject.toml)
+husk.cli:main()  (Click group, entry point from packages/husk-studio-cli/pyproject.toml)
       │
       ▼
-start()  →  server.start_server()          packages/husk-cli/src/husk/server.py
+start()  →  server.start_server()          packages/husk-studio-cli/src/husk/server.py
       │        ├─ _resolve_port(7654)      picks 7654, or scans 7654..7664 if busy
       │        ├─ _write_port_file()       ~/.husk/port  (so `demo`/`replay` can find it)
       │        ├─ threading.Timer(1.2s) → webbrowser.open(url)   ui_launcher.py
@@ -44,8 +44,8 @@ One process, one port, no build step at request time (the SPA is prebuilt — se
 
 Unlike an architecture where a shell process spawns a separate backend process it then has to
 health-check (the Hermes/Electron pattern), here the CLI *is* the backend process. `start()` in
-[cli.py:50-54](../packages/husk-cli/src/husk/cli.py:50) calls `start_server()` in
-[server.py:48-73](../packages/husk-cli/src/husk/server.py:48), which constructs a
+[cli.py:50-54](../packages/husk-studio-cli/src/husk/cli.py:50) calls `start_server()` in
+[server.py:48-73](../packages/husk-studio-cli/src/husk/server.py:48), which constructs a
 `uvicorn.Config` for `husk_studio_backend.main:app` and calls `.run()` **in the same process** —
 no `subprocess.Popen`, no readiness polling, no second interpreter to wait on. There is nothing
 analogous to Hermes's `waitForHermesReady()` handshake because there is no second process to
@@ -53,7 +53,7 @@ wait for.
 
 ## 2. Port discovery: resolved before bind, not announced after
 
-`_resolve_port()` ([server.py:23-33](../packages/husk-cli/src/husk/server.py:23)) tries 7654,
+`_resolve_port()` ([server.py:23-33](../packages/husk-studio-cli/src/husk/server.py:23)) tries 7654,
 then scans 7654–7664 for the first free port, entirely on the Python side, *before* uvicorn
 binds. The chosen port is written to `~/.husk/port` so other CLI commands (`demo`, `replay`) can
 find the running backend, and it's baked into the `http://localhost:{port}` URL the browser gets
@@ -137,7 +137,7 @@ in the picture at all. The browser tab *is* the direct, first-class client of th
 The Hermes reference doc lists a boot handshake, port announcement, IPC proxying, and
 token-gated local traffic as necessary complexity for its shape (Electron shell as a separate
 process spawning and mediating access to a Python backend). None of that machinery exists here
-because there is no separate shell process to broker access — `husk-ai start` *is* the backend,
+because there is no separate shell process to broker access — `husk-studio start` *is* the backend,
 serving its own UI directly, opened in whatever browser the OS already has. That's a deliberate
 trade: less resilience machinery (no reconnect-on-wake-from-sleep, no OAuth refresh flow), in
 exchange for a much smaller moving-parts count, consistent with Husk's local-first,

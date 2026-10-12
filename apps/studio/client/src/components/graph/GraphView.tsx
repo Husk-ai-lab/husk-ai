@@ -28,21 +28,21 @@ interface StatusColors {
 type StatusKey = "error" | "success" | "skipped" | "running";
 
 const STATUS_LIGHT: Record<StatusKey, StatusColors> = {
-  error: { fill: "#26272c", stroke: "#26272c", dot: "#26272c", name: "#f4f4f6", text: "#f4f4f6" },
-  success: { fill: "#f3f3f5", stroke: "#c4c5ca", dot: "#8a8b91", name: "#26272c", text: "#26272c" },
-  skipped: { fill: "#f8f8f9", stroke: "#e3e3e6", dot: "#bcbdc2", name: "#4a4b51", text: "#8a8b91" },
-  running: { fill: "#e9e9ec", stroke: "#8a8b91", dot: "#55565c", name: "#26272c", text: "#26272c" },
+  error: { fill: "#27262d", stroke: "#27262d", dot: "#27262d", name: "#f4f4f8", text: "#f4f4f8" },
+  success: { fill: "#f3f3f7", stroke: "#c5c4cb", dot: "#8b8a93", name: "#27262d", text: "#27262d" },
+  skipped: { fill: "#f8f8fc", stroke: "#e3e3e7", dot: "#bdbcc3", name: "#4b4a53", text: "#8b8a93" },
+  running: { fill: "#e9e9ed", stroke: "#8b8a93", dot: "#56555e", name: "#27262d", text: "#27262d" },
 };
 
 const STATUS_DARK: Record<StatusKey, StatusColors> = {
-  error: { fill: "#f2f2f4", stroke: "#f2f2f4", dot: "#f2f2f4", name: "#1a1b1f", text: "#1a1b1f" },
-  success: { fill: "#26272e", stroke: "#3c3d45", dot: "#9a9ba3", name: "#e9e9ec", text: "#c8c9ce" },
-  skipped: { fill: "#202127", stroke: "#2c2d34", dot: "#6a6b73", name: "#c8c9ce", text: "#7d7e86" },
-  running: { fill: "#2c2d35", stroke: "#9a9ba3", dot: "#d0d1d6", name: "#e9e9ec", text: "#e9e9ec" },
+  error: { fill: "#f2f2f6", stroke: "#f2f2f6", dot: "#f2f2f6", name: "#1b1a20", text: "#1b1a20" },
+  success: { fill: "#282630", stroke: "#3e3c47", dot: "#9c9aa5", name: "#e9e9ed", text: "#c9c8cf" },
+  skipped: { fill: "#212029", stroke: "#2e2c36", dot: "#6c6a75", name: "#c9c8cf", text: "#7f7d88" },
+  running: { fill: "#2e2c37", stroke: "#9c9aa5", dot: "#d1d0d7", name: "#e9e9ed", text: "#e9e9ed" },
 };
 
-const CHROME_LIGHT = { arrow: "#a8a9ae", edge: "#c4c5ca", edgeLabel: "#8a8b91", selectedStroke: "#26272c", flagIcon: "#26272c" };
-const CHROME_DARK = { arrow: "#5a5b63", edge: "#3c3d45", edgeLabel: "#9a9ba3", selectedStroke: "#f2f2f4", flagIcon: "#e9e9ec" };
+const CHROME_LIGHT = { arrow: "#a9a8af", edge: "#c5c4cb", edgeLabel: "#8b8a93", selectedStroke: "#27262d", flagIcon: "#27262d" };
+const CHROME_DARK = { arrow: "#5c5a65", edge: "#3e3c47", edgeLabel: "#9c9aa5", selectedStroke: "#f2f2f6", flagIcon: "#e9e9ed" };
 
 function statusOf(status: Record<StatusKey, StatusColors>, s: string): StatusColors {
   return status[s as StatusKey] ?? status.skipped;

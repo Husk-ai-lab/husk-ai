@@ -1,7 +1,7 @@
 """Package version, read from installed metadata.
 
 Hardcoding it here meant it drifted from pyproject.toml: the 0.8.0 release bumped
-every manifest but left this at "0.7.0", so `husk-ai --version`, `doctor`, and the
+every manifest but left this at "0.7.0", so `husk-studio --version`, `doctor`, and the
 `husk_version` field of every export bundle all reported the previous release.
 Reading the installed distribution's metadata makes pyproject.toml the only place a
 version is written.

@@ -2,6 +2,35 @@
 
 All notable changes, grouped by theme; newest first.
 
+## [Unreleased] — Husk Studio: rename, new palette, standalone binary
+
+### Changed
+- **Renamed from husk-ai to Husk Studio.** The command is now `husk-studio`; `husk-ai` and
+  `husk` keep working as aliases, so existing shell history and MCP client configs still run.
+  Packages and imports were renamed to match:
+
+  | Before | After |
+  |---|---|
+  | `husk-ai` (dist) | `husk-studio` |
+  | `husk` (import) | `husk_studio` |
+  | `husk-shared` / `husk_shared` | `husk-studio-shared` / `husk_studio_shared` |
+  | `husk-sandbox` / `husk_sandbox` | `husk-studio-sandbox` / `husk_studio_sandbox` |
+  | `packages/husk-cli` | `packages/husk-studio-cli` |
+
+  **Breaking:** agent code that does `from husk_shared import ...` must import
+  `husk_studio_shared` instead (and `pip install 'husk-studio-shared[openai]'`). No shim is shipped.
+- **Deliberately unchanged**, because renaming would orphan existing data or user configs: the
+  `HUSK_*` environment variables, the `~/.husk` data directory, the `husk.*` span attributes, the
+  MCP server key `husk` (`mcp__husk__*`), the VS Code extension ids and `husk-cursor-hook` command,
+  and the GitHub / GHCR paths (they follow the GitHub repo name).
+- Studio recoloured to the Husk Studio palette: violet `#7456f4` (light) / `#8c71ff` (dark) on
+  violet-tinted neutrals. Colours only; layout and type are untouched.
+
+### Added
+- **Standalone binary.** `husk-studio.spec` + `packaging/build.py` build a PyInstaller bundle
+  (Studio UI included) with no Python or Node needed on the target machine, and
+  `packaging/tests/` boots the built binary and exercises it end to end.
+
 ## [0.8.1] — The documented `docker exec` actually works — 2026-08-09
 
 ### Fixed

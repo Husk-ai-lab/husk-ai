@@ -29,7 +29,7 @@ async def summary() -> dict[str, Any]:
 async def compute_dashboard_summary() -> dict[str, Any]:
     """Aggregate the development home from the local runs/spans tables.
 
-    Extracted from the `/summary` route so other entry points (the `husk-ai mcp`
+    Extracted from the `/summary` route so other entry points (the `husk-studio mcp`
     server's `dashboard_summary` tool) can reuse the exact same computation
     instead of duplicating the queries.
     """

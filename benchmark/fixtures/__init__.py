@@ -15,8 +15,8 @@ from pathlib import Path
 
 from sqlalchemy import create_engine
 
-from husk_shared import RECORDING_FORMAT_VERSION, check_format_version
 from husk_studio_backend.db.models import Base
+from husk_studio_shared import RECORDING_FORMAT_VERSION, check_format_version
 
 FIXTURE_ROOT = Path(__file__).resolve().parent
 CANONICAL_RUN = FIXTURE_ROOT / "canonical_run"

@@ -54,7 +54,7 @@
         "husk.url": {
           "type": "string",
           "default": "http://localhost:7654",
-          "description": "URL of your local Husk backend. Override only if you ran `husk start --port <other>`."
+          "description": "URL of your local Husk backend. Override only if you ran `husk-studio start --port <other>`."
         },
         "husk.captureTerminal": {
           "type": "boolean",

@@ -24,8 +24,8 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
-from husk_shared.pricing import cost_usd
 from husk_studio_backend.db.models import RunRow, SpanRow
+from husk_studio_shared.pricing import cost_usd
 
 ROOT_SPAN_NAME = "agent.run"
 

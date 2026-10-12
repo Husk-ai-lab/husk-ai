@@ -26,7 +26,7 @@ corepack pnpm install                      # only if working on the Studio UI
 Boot the backend and Studio:
 
 ```bash
-uv run husk-ai start   # opens http://localhost:7654
+uv run husk-studio start   # opens http://localhost:7654
 ```
 
 ## Checks

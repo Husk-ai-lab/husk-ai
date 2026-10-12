@@ -25,11 +25,11 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from husk_shared.pricing import cost_usd
 from husk_studio_backend.db.engine import async_session
 from husk_studio_backend.db.models import RunRow, SpanRow
 from husk_studio_backend.ingest.broadcast import publish
 from husk_studio_backend.ingest.otel_parser import ParsedSpan, parse_otlp_traces
+from husk_studio_shared.pricing import cost_usd
 
 log = logging.getLogger(__name__)
 router = APIRouter(tags=["otel"])

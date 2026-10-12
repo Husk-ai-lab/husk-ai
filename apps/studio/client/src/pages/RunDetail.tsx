@@ -545,7 +545,7 @@ function Actions({
         <p className="text-[11px] leading-relaxed text-muted-foreground">
           {replayable
             ? "Fork the thread from the selected span with edited state. The original run is preserved."
-            : "Replay needs a graph-instrumented run (it must record husk.graph_module — e.g. an agent on Husk's engine). This run is observability-only."}
+            : "Replay needs a graph-instrumented run (it must record husk.graph_module — e.g. an agent on Husk Studio's engine). This run is observability-only."}
         </p>
 
         {parentBranch && (

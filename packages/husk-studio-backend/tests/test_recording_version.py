@@ -12,17 +12,17 @@ from pathlib import Path
 import pytest
 from sqlalchemy import create_engine
 
-from husk_shared import (
-    RECORDING_FORMAT_VERSION,
-    RecordingFormatError,
-    check_format_version,
-)
 from husk_studio_backend.db.engine import (
     _ensure_recording_version,
     _migration_steps,
     verify_recording_version,
 )
 from husk_studio_backend.db.models import Base
+from husk_studio_shared import (
+    RECORDING_FORMAT_VERSION,
+    RecordingFormatError,
+    check_format_version,
+)
 
 
 def _user_version(db: Path) -> int:

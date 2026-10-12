@@ -4,7 +4,7 @@ import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 
 // In dev the studio talks to the local Husk backend. The backend's default
-// port is 7654 but `husk-ai start` will fall back to the next free port if 7654
+// port is 7654 but `husk-studio start` will fall back to the next free port if 7654
 // is taken — so we let the dev shell override it via VITE_BACKEND_PORT.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");

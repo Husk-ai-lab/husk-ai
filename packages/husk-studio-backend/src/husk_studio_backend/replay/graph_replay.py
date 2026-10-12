@@ -4,7 +4,7 @@ An instrumented run writes `husk.graph_module = "/abs/path/file.py:graph"` on th
 run's root span. The replay endpoint reads that attribute, imports the file
 fresh, and either resumes it from a Husk checkpoint (`replay_from`) or re-invokes
 it (`invoke`) with the user's state override. The resume/replay itself is owned
-by Husk's own engine (`husk_shared.engine`); this module only locates and drives
+by Husk's own engine (`husk_studio_shared.engine`); this module only locates and drives
 the user's graph module.
 
 Security note: this dynamically imports user code by path. Local-only MVP.
@@ -37,7 +37,7 @@ class GraphModuleNotAllowed(PermissionError):
 def _allowed_roots() -> list[Path]:
     """Directories a replay is permitted to import a graph module from.
 
-    Default: the backend's current working directory (where ``husk-ai start`` was
+    Default: the backend's current working directory (where ``husk-studio start`` was
     launched, i.e. the user's project). Extra roots can be added via
     ``HUSK_ALLOWED_GRAPH_DIRS`` (os.pathsep-separated). This is the gate that turns
     the dynamic ``exec_module`` from "import any path on disk" (an RCE primitive

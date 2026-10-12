@@ -23,7 +23,7 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from husk_shared.pricing import cost_usd
+from husk_studio_shared.pricing import cost_usd
 
 # Equal input/output token split assumption (conservative -- output is pricier
 # and represents the work actually preserved).
@@ -115,7 +115,7 @@ def main() -> int:
     emit("These are tokens that the modify-and-replay engine bypassed at the")
     emit("upstream nodes of failed runs in the benchmark. The figure below")
     emit("translates that saving into per-provider USD using current list prices")
-    emit("(packages/husk-shared/src/husk_shared/pricing.py).")
+    emit("(packages/husk-studio-shared/src/husk_studio_shared/pricing.py).")
     emit("")
     emit("| Provider:model | $ saved (this benchmark) | vs Groq smallest |")
     emit("|---|---:|---:|")
