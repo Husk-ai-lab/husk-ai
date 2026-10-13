@@ -1,0 +1,266 @@
+# Builds the Husk Studio binary for the desktop shell.
+#   push to main  -> verify, build, smoke-test, test the archive, upload workflow artefacts + report (no release)
+#   tag v*        -> the same, then a DRAFT GitHub release (a person reads the report and publishes it)
+# The packaging logic lives in packaging/release.py so the same steps run on one machine without CI
+# (see packaging/RELEASING.md). Same shape as the backend's desktop-build workflow.
+#
+# This workflow owns the release for a version tag. It replaces release.yml, which created a published
+# release with no assets: two workflows creating the same release collide.
+#
+# Not wired yet: code signing / notarisation (no certificates exist). Every build is unsigned and the
+# report says so. No pull_request trigger on purpose: ci.yml owns PRs, and nothing here needs to run
+# on untrusted code.
+name: desktop-build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/**"
+      - "apps/studio/**"
+      - "packaging/**"
+      - "husk-studio.spec"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/desktop-build.yml"
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-build-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  # Targets that must build for the run (and a release) to count as good. Add the others once each
+  # has gone green once: x86_64-apple-darwin, x86_64-pc-windows-msvc, x86_64-unknown-linux-gnu.
+  # Then drop `experimental` on that matrix row.
+  REQUIRED_TRIPLES: aarch64-apple-darwin
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "20"
+      - id: ver
+        # The version gate: the tag, the root and the four package versions must agree. It exits
+        # non-zero printing every value when they do not. Otherwise it prints the label of this
+        # build: the tag's version, or <version>-dev.<sha> for a branch or a manual run.
+        name: Version gate and label
+        run: python3 packaging/release.py version --ref-type "$GITHUB_REF_TYPE" --ref-name "$GITHUB_REF_NAME" --sha "$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+      - name: Sync workspace (+ examples for the replay/determinism tests)
+        run: uv sync --frozen --all-packages --group examples
+      - run: uv run ruff check .
+      - run: uv run mypy
+      - name: Pytest
+        run: mkdir -p report && uv run python -m pytest -q --junitxml=report/pytest.xml
+      - name: Packaging script tests
+        run: uv run python -m pytest packaging/tests/test_release.py -q
+      - run: corepack enable
+      - run: corepack pnpm install --frozen-lockfile
+      - run: corepack pnpm --filter studio check
+      - name: Studio unit tests
+        run: corepack pnpm --filter studio exec vitest run --reporter=json --outputFile="$GITHUB_WORKSPACE/report/vitest.json"
+      - name: Build the Studio UI (once; every target reuses it)
+        run: corepack pnpm --filter studio build
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ui
+          path: apps/studio/dist
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: quality
+          path: report
+          if-no-files-found: ignore
+
+  build:
+    needs: verify
+    name: build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    continue-on-error: ${{ matrix.experimental }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: mac-arm64, runner: macos-14, triple: aarch64-apple-darwin, experimental: false }
+          # Never built in CI yet, so a failure must not block the arm64 build. Promote each into
+          # REQUIRED_TRIPLES after it has been green once. macos-15-intel is the last Intel image
+          # GitHub offers (macos-13 is retired).
+          - { target: mac-x64, runner: macos-15-intel, triple: x86_64-apple-darwin, experimental: true }
+          - { target: win-x64, runner: windows-latest, triple: x86_64-pc-windows-msvc, experimental: true }
+          # 22.04, not latest: an older glibc runs on more distributions.
+          - { target: linux-x64, runner: ubuntu-22.04, triple: x86_64-unknown-linux-gnu, experimental: true }
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+      TRIPLE: ${{ matrix.triple }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ui
+          path: apps/studio/dist
+      - name: Build the one-folder binary (UI already built, so build.py skips it)
+        # Onedir only: the shell refuses a bare executable. build.py syncs a clean .venv-build
+        # (no dev, no examples) and runs PyInstaller against husk-studio.spec.
+        run: uv run --no-project python packaging/build.py
+      - name: Package, check the archive and run it like the shell does
+        env:
+          UV_PROJECT_ENVIRONMENT: .venv-build
+        run: uv run --no-sync python packaging/release.py package --version "$VERSION" --triple "$TRIPLE" --smoke --out dist
+      - name: Unpack the archive that will ship
+        run: |
+          set -euo pipefail
+          asset=$(uv run --no-project python -c 'import json,sys; print(json.load(open(f"dist/report/{sys.argv[1]}.json"))["asset_name"])' "$TRIPLE")
+          bin=$(uv run --no-project python packaging/release.py extract --archive "dist/$asset" --dest dist/extracted --triple "$TRIPLE")
+          echo "HUSK_STUDIO_BINARY=$bin" >> "$GITHUB_ENV"
+      - name: Sync the test environment
+        run: uv sync --frozen --all-packages
+      - name: Binary tests against the extracted archive (not dist/)
+        id: tests
+        continue-on-error: true
+        run: uv run --frozen python -m pytest packaging/tests/test_binary.py -q --junitxml="dist/report/binary-tests-$TRIPLE.xml"
+      - name: Record the binary tests on the target
+        if: always()
+        env:
+          TESTS_OUTCOME: ${{ steps.tests.outcome }}
+        run: uv run --no-project python packaging/release.py mark-tests --triple "$TRIPLE" --outcome "$TESTS_OUTCOME" --reports dist/report
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: build-${{ matrix.target }}
+          path: |
+            dist/husk-studio-*.tar.gz
+            dist/husk-studio-*.zip
+            dist/report/*.json
+            dist/report/*.xml
+          if-no-files-found: error
+      - name: Fail the job when the binary tests failed
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "binary tests failed against the extracted archive for $TRIPLE" >&2
+          exit 1
+
+  report:
+    needs: [verify, build]
+    if: always() && needs.verify.result != 'skipped'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: build-*
+          path: release
+          merge-multiple: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: quality
+          path: quality
+        continue-on-error: true
+      - name: Release report (fails if a required target is missing)
+        env:
+          TAG: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
+          VERIFY: ${{ needs.verify.result }}
+        run: |
+          python3 packaging/release.py report \
+            --reports release/report --out release \
+            --require "$REQUIRED_TRIPLES" \
+            --pytest-xml quality/pytest.xml --vitest-json quality/vitest.json \
+            --check "verify=$VERIFY" ${TAG:+--tag "$TAG"}
+      - name: Job summary
+        if: always()
+        run: cat release/RELEASE_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Release notes = the CHANGELOG section, then the report
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          base="${version%%-*}"   # v0.8.2-alpha.1 has no section of its own: fall back to 0.8.2
+          : > section.md
+          for ver in "$version" "$base"; do
+            # Literal index() matching (no regex) so version brackets need no escaping.
+            awk -v ver="$ver" '
+              index($0, "## [" ver "]") == 1 { capture = 1; next }
+              capture && index($0, "## [") == 1 { exit }
+              capture { print }
+            ' CHANGELOG.md > section.md
+            [ -s section.md ] && break
+          done
+          if [ ! -s section.md ]; then
+            printf "Release %s\n" "$GITHUB_REF_NAME" > section.md
+          fi
+          { cat section.md; printf '\n---\n\n'; cat release/RELEASE_REPORT.md; } > release/RELEASE_NOTES.md
+          echo "----- release notes -----"
+          cat release/RELEASE_NOTES.md
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: release-meta
+          path: |
+            release/release-report.json
+            release/RELEASE_REPORT.md
+            release/RELEASE_NOTES.md
+            release/SHA256SUMS
+          if-no-files-found: ignore
+
+  release:
+    # A draft, on purpose: a person looks at the report and publishes. The shell ignores drafts.
+    # The only job with write access, and it checks nothing out and runs no repository code.
+    needs: report
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: build-*
+          path: assets
+          merge-multiple: true
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-meta
+          path: assets
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Upload exactly the archives the report lists as built and verified. A target that
+          # failed its smoke or binary tests also left an archive in the artefact; it must not ship.
+          mapfile -t names < <(python3 -c 'import json; print(*[a["name"] for a in json.load(open("assets/release-report.json"))["assets"]], sep="\n")')
+          [ "${#names[@]}" -gt 0 ] || { echo "no verified archives to publish" >&2; exit 1; }
+          files=()
+          for n in "${names[@]}"; do
+            [ -f "assets/$n" ] || { echo "report lists $n but it is not in the artefact" >&2; exit 1; }
+            files+=("assets/$n")
+          done
+          prerelease=()
+          case "$GITHUB_REF_NAME" in *-*) prerelease=(--prerelease) ;; esac
+          gh release create "$GITHUB_REF_NAME" "${files[@]}" assets/SHA256SUMS assets/release-report.json \
+            --repo "$GITHUB_REPOSITORY" --draft "${prerelease[@]}" --verify-tag \
+            --title "Husk Studio ${GITHUB_REF_NAME#v}" --notes-file assets/RELEASE_NOTES.md

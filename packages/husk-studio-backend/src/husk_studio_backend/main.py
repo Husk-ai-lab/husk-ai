@@ -334,6 +334,14 @@ async def health() -> dict[str, Any]:
     return {"ok": True, "service": "husk-studio-backend", "version": __version__}
 
 
+@app.get("/health")
+async def health_root() -> dict[str, Any]:
+    # Same body as /api/health, at the conventional path. It has to be registered
+    # here, before the SPA fallback below, or `/health` is answered with index.html
+    # (200 text/html) and a supervisor probing it believes the backend is up.
+    return await health()
+
+
 @app.get("/healthz")
 async def healthz() -> dict[str, Any]:
     # Back-compat alias for older clients.

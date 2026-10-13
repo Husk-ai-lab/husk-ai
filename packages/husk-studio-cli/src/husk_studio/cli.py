@@ -89,11 +89,28 @@ def main(log_level: str) -> None:
 @click.option("--host", default="127.0.0.1", help="Bind host.")
 @click.option("--no-open-browser", is_flag=True, help="Do not auto-open the browser.")
 def start(port: int, host: str, no_open_browser: bool) -> None:
-    """Boot the Husk backend and open the Studio in your browser."""
-    from husk_studio.server import start_server
+    """Boot the Husk backend and open the Studio in your browser.
 
+    Without --port, a busy 7654 falls back to the next free port (up to 7664).
+    With --port, that exact port is required: if it is busy this exits non-zero.
+    """
+    from click.core import ParameterSource
+
+    from husk_studio.server import PortInUseError, start_server
+
+    explicit = click.get_current_context().get_parameter_source("port") is (
+        ParameterSource.COMMANDLINE
+    )
     try:
-        start_server(host=host, port=port, open_browser=not no_open_browser)
+        start_server(
+            host=host, port=port, open_browser=not no_open_browser, strict_port=explicit
+        )
+    except PortInUseError as exc:
+        click.echo(
+            f"error: {exc}; --port was given explicitly, so husk-studio will not pick another",
+            err=True,
+        )
+        sys.exit(1)
     except KeyboardInterrupt:
         console.print("\n[dim]Husk Studio stopped.[/dim]")
         sys.exit(0)

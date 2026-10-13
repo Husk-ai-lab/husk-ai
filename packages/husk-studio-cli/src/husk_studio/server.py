@@ -20,10 +20,20 @@ def _port_free(host: str, port: int) -> bool:
             return False
 
 
-def _resolve_port(host: str, port: int) -> int:
-    """If `port` is busy, scan a small window for the next free port."""
+class PortInUseError(RuntimeError):
+    """An explicitly requested port is busy and must not be silently replaced."""
+
+
+def _resolve_port(host: str, port: int, *, strict: bool = False) -> int:
+    """If `port` is busy, scan a small window for the next free port.
+
+    With `strict=True` (the caller asked for this exact port) a busy port is an
+    error instead: a supervisor that was told 7654 must not find us on 7657.
+    """
     if _port_free(host, port):
         return port
+    if strict:
+        raise PortInUseError(f"port {port} is already in use")
     for p in range(port + 1, port + 11):
         if _port_free(host, p):
             log.warning("port %d busy; using %d instead", port, p)
@@ -50,13 +60,15 @@ def start_server(
     host: str = "127.0.0.1",
     port: int = 7654,
     open_browser: bool = True,
+    strict_port: bool = False,
 ) -> None:
     """Boot the Husk FastAPI backend in the foreground.
 
     Blocks until Ctrl+C. The browser is opened ~1.2s after boot so uvicorn
-    has time to bind the socket before the user lands.
+    has time to bind the socket before the user lands. With `strict_port`, a
+    busy `port` raises PortInUseError instead of moving to the next free one.
     """
-    port = _resolve_port(host, port)
+    port = _resolve_port(host, port, strict=strict_port)
     _write_port_file(port)
 
     if open_browser:

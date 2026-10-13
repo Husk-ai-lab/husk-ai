@@ -249,6 +249,64 @@ def test_run_executes_the_command_and_points_it_at_the_backend(
     assert "View runs:" in r.stdout
 
 
+def test_explicit_busy_port_fails_instead_of_drifting(cli_home: Path, cwd: Path) -> None:
+    """`start --port N` means N. A supervisor told 7654 must not find the app on 7657."""
+    with socket.socket() as busy:
+        busy.bind(("127.0.0.1", 0))
+        busy.listen()
+        port = busy.getsockname()[1]
+        r = run_cli("start", "--port", str(port), "--no-open-browser", home=cli_home, cwd=cwd, timeout=30)
+    assert r.returncode != 0, r.stdout + r.stderr
+    assert f"port {port} is already in use" in r.stderr
+    assert "Traceback" not in r.stderr
+    assert not (cli_home / "port").exists(), "a port file for a server that never started"
+
+
+def test_sigterm_stops_the_server_and_leaves_no_orphans(cli_home: Path, cwd: Path) -> None:
+    """The shell stops Studio with SIGTERM, 5 s grace, then kill. On Windows
+    `terminate()` is a hard TerminateProcess, so there only the process tree is asserted."""
+    psutil = pytest.importorskip("psutil")
+    assert BINARY is not None
+    port = _free_port()
+    log = cwd / "sigterm.log"
+    with log.open("wb") as fh:
+        proc = subprocess.Popen(
+            [str(BINARY), "start", "--port", str(port), "--host", "127.0.0.1", "--no-open-browser"],
+            cwd=cwd,
+            env=_env(cli_home),
+            stdout=fh,
+            stderr=subprocess.STDOUT,
+        )
+    try:
+        deadline = time.time() + 90
+        while time.time() < deadline:
+            assert proc.poll() is None, f"exited early ({proc.returncode}):\n{log.read_text()[-2000:]}"
+            try:
+                if httpx.get(f"http://127.0.0.1:{port}/health", timeout=2).status_code == 200:
+                    break
+            except httpx.HTTPError:
+                time.sleep(0.3)
+        else:
+            pytest.fail(f"never became healthy:\n{log.read_text()[-2000:]}")
+
+        # onefile has a bootloader parent and a worker child; onedir has none. Either way
+        # nothing in the tree may outlive the process the shell signalled.
+        tree = psutil.Process(proc.pid).children(recursive=True)
+        started = time.time()
+        proc.terminate()
+        code = proc.wait(timeout=10)
+        stopped_in = time.time() - started
+    finally:
+        if proc.poll() is None:
+            proc.kill()
+
+    assert stopped_in < 5, f"took {stopped_in:.1f}s to stop; the shell kills after 5 s"
+    if os.name != "nt":
+        assert code in (0, -15), f"unexpected exit code {code}:\n{log.read_text()[-2000:]}"
+    _, alive = psutil.wait_procs(tree, timeout=5)
+    assert not alive, f"orphaned processes after SIGTERM: {[p.pid for p in alive]}"
+
+
 def test_mcp_server_speaks_stdio_and_lists_its_tools(cli_home: Path, cwd: Path) -> None:
     """Proves `mcp` (and its `version("mcp")` metadata lookup) survived freezing."""
     assert BINARY is not None
@@ -391,6 +449,17 @@ def test_health_reports_the_backend_version(server: Server) -> None:
         assert body["service"] == "husk-studio-backend"
         assert body["version"] == EXPECTED_VERSION
         assert c.get("/healthz").json() == {"ok": True}
+
+
+def test_health_root_is_json_not_the_ui_fallback(server: Server) -> None:
+    """The desktop shell probes /health. Unregistered, the SPA fallback answers it with
+    index.html (200 text/html), so a dead backend and a live one look the same."""
+    with server.client() as c:
+        r = c.get("/health")
+        assert r.status_code == 200
+        assert r.headers["content-type"].startswith("application/json"), r.text[:200]
+        assert r.json() == c.get("/api/health").json()
+        assert r.json()["version"] == EXPECTED_VERSION
 
 
 def test_port_file_is_written(server: Server) -> None:

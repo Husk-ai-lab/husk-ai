@@ -1,6 +1,6 @@
 [project]
 name = "husk-studio-workspace"
-version = "0.8.1"
+version = "0.9.1"
 description = "Husk Studio monorepo workspace root — visual interactive debugger for AI agents"
 requires-python = ">=3.11"
 license = { text = "BUSL-1.1" }
@@ -35,6 +35,8 @@ dev = [
     "ruff>=0.7",
     "mypy>=1.13",
     "pre-commit>=4.0",
+    # packaging/tests: assert no child process outlives the binary after SIGTERM.
+    "psutil>=6.0",
 ]
 # Used only by packaging/build.py to freeze the standalone binary.
 build = [

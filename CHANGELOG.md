@@ -2,7 +2,7 @@
 
 All notable changes, grouped by theme; newest first.
 
-## [Unreleased] — Husk Studio: rename, new palette, standalone binary
+## [0.9.1] — Husk Studio: rename, new palette, standalone binary, CI-built archives — 2026-10-13
 
 ### Changed
 - **Renamed from husk-ai to Husk Studio.** The command is now `husk-studio`; `husk-ai` and
@@ -25,11 +25,27 @@ All notable changes, grouped by theme; newest first.
   and the GitHub / GHCR paths (they follow the GitHub repo name).
 - Studio recoloured to the Husk Studio palette: violet `#7456f4` (light) / `#8c71ff` (dark) on
   violet-tinted neutrals. Colours only; layout and type are untouched.
+- **`husk-studio start --port N` now means exactly N.** If N is busy it exits with status 1 and
+  `error: port N is already in use; --port was given explicitly, so husk-studio will not pick
+  another`, instead of silently moving to N+1. Without `--port` the fallback up to 7664 is
+  unchanged, and so is `husk-studio run`. Scripts that passed `--port` and relied on the drift
+  should drop the flag (and read the bound port from `~/.husk/port`).
 
 ### Added
 - **Standalone binary.** `husk-studio.spec` + `packaging/build.py` build a PyInstaller bundle
   (Studio UI included) with no Python or Node needed on the target machine, and
   `packaging/tests/` boots the built binary and exercises it end to end.
+- **`GET /health`**, the same JSON as `/api/health`. It used to fall through to the Studio's
+  single-page fallback and answer `200 text/html`, so a supervisor probing `/health` could not tell
+  a running backend from any other web server.
+- **CI-built desktop archives.** `.github/workflows/desktop-build.yml` builds the one-folder
+  binary on native macOS (arm64, Intel), Windows and Linux runners, checks the layout and CPU of
+  every native file, starts the extracted archive the way the desktop shell does, runs the binary
+  tests against it, and attaches `husk-studio-<version>-<triple>.(tar.gz|zip)`, `SHA256SUMS` and
+  `release-report.json` to a **draft** GitHub release for each `v*` tag. It replaces `release.yml`,
+  which published an asset-less release. Builds are unsigned. See `packaging/RELEASING.md`.
+- `packaging/release.py`: the stdlib-only packaging, version-gate and report script behind it
+  (also runnable on one machine).
 
 ## [0.8.1] — The documented `docker exec` actually works — 2026-08-09
 
