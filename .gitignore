@@ -134,3 +134,6 @@ my-video/
 
 # PyInstaller build environment (packaging/build.py)
 .venv-build/
+
+# Local-only notes on the first desktop (PyInstaller) release.
+/DESKTOP_RELEASE.md
