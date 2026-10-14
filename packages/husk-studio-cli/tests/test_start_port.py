@@ -6,7 +6,9 @@ come up, so an explicit port that is busy has to be an error, not a quiet move.
 
 from __future__ import annotations
 
+import os
 import socket
+import time
 from typing import Any
 
 import pytest
@@ -38,6 +40,59 @@ def test_resolve_port_strict_returns_a_free_port_unchanged() -> None:
     probe, port = _busy_port()
     probe.close()
     assert server._resolve_port("127.0.0.1", port, strict=True) == port
+
+
+posix_only = pytest.mark.skipif(os.name != "posix", reason="TIME_WAIT/SO_REUSEADDR semantics are POSIX")
+
+
+@posix_only
+def test_a_port_with_only_time_wait_leftovers_is_free() -> None:
+    """A run that just stopped leaves TIME_WAIT sockets on its port for 30-60 s. They are not a
+    listener, and uvicorn binds over them, so `--port` must not treat them as busy."""
+    srv = socket.socket()
+    srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    srv.bind(("127.0.0.1", 0))
+    srv.listen()
+    port = int(srv.getsockname()[1])
+    cli = socket.create_connection(("127.0.0.1", port))
+    conn, _ = srv.accept()
+    conn.close()  # the server side closes first -> TIME_WAIT on `port`
+    time.sleep(0.1)
+    cli.close()
+    srv.close()
+    assert server._resolve_port("127.0.0.1", port, strict=True) == port
+
+
+@posix_only
+def test_a_live_listener_is_still_refused_with_so_reuseaddr_set() -> None:
+    """uvicorn listens with SO_REUSEADDR; the check must not mistake that for free."""
+    live = socket.socket()
+    live.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    live.bind(("127.0.0.1", 0))
+    live.listen()
+    port = int(live.getsockname()[1])
+    try:
+        with pytest.raises(server.PortInUseError):
+            server._resolve_port("127.0.0.1", port, strict=True)
+        assert server._resolve_port("127.0.0.1", port) != port
+    finally:
+        live.close()
+
+
+@posix_only
+def test_a_wildcard_listener_is_refused_for_a_loopback_start() -> None:
+    """macOS lets a loopback bind coexist with a 0.0.0.0 listener once SO_REUSEADDR is set
+    (e.g. `docker run -p 7654:7654`); Studio would then shadow it. It must read as busy."""
+    wild = socket.socket()
+    wild.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    wild.bind(("0.0.0.0", 0))
+    wild.listen()
+    port = int(wild.getsockname()[1])
+    try:
+        with pytest.raises(server.PortInUseError):
+            server._resolve_port("127.0.0.1", port, strict=True)
+    finally:
+        wild.close()
 
 
 def test_start_with_a_busy_explicit_port_exits_nonzero_with_one_clear_line(

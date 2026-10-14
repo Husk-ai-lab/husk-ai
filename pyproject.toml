@@ -1,6 +1,6 @@
 [project]
 name = "husk-studio-workspace"
-version = "0.9.1"
+version = "0.9.2"
 description = "Husk Studio monorepo workspace root — visual interactive debugger for AI agents"
 requires-python = ">=3.11"
 license = { text = "BUSL-1.1" }

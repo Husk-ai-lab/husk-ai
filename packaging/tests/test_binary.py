@@ -307,6 +307,53 @@ def test_sigterm_stops_the_server_and_leaves_no_orphans(cli_home: Path, cwd: Pat
     assert not alive, f"orphaned processes after SIGTERM: {[p.pid for p in alive]}"
 
 
+@pytest.mark.skipif(os.name != "posix", reason="TIME_WAIT blocks a plain bind on POSIX only")
+def test_restart_right_after_a_stop_binds_the_same_explicit_port(cli_home: Path, cwd: Path) -> None:
+    """The shell stops Studio and starts it again on the same `--port` within seconds. A client
+    that is still connected leaves TIME_WAIT sockets on that port for 30-60 s; they must not make
+    `start --port N` exit 1 with "already in use"."""
+    assert BINARY is not None
+    port = _free_port()
+    cmd = [str(BINARY), "start", "--port", str(port), "--host", "127.0.0.1", "--no-open-browser"]
+    base = f"http://127.0.0.1:{port}"
+
+    def boot(log: Path) -> subprocess.Popen[bytes]:
+        with log.open("wb") as fh:
+            proc = subprocess.Popen(
+                cmd, cwd=cwd, env=_env(cli_home), stdout=fh, stderr=subprocess.STDOUT
+            )
+        deadline = time.time() + 90
+        while time.time() < deadline:
+            assert proc.poll() is None, f"exited early ({proc.returncode}):\n{log.read_text()[-2000:]}"
+            try:
+                if httpx.get(f"{base}/api/health", timeout=2).status_code == 200:
+                    return proc
+            except httpx.HTTPError:
+                time.sleep(0.3)
+        proc.kill()
+        pytest.fail(f"never became healthy:\n{log.read_text()[-2000:]}")
+
+    first = boot(cwd / "first.log")
+    try:
+        with httpx.Client(base_url=base) as client:  # keep-alive connection stays open
+            assert client.get("/api/health").status_code == 200
+            first.terminate()
+            assert first.wait(timeout=10) in (0, -15)
+    finally:
+        if first.poll() is None:
+            first.kill()
+
+    second = boot(cwd / "second.log")  # immediately, no wait for TIME_WAIT to drain
+    try:
+        assert httpx.get(f"{base}/api/health", timeout=5).json()["ok"] is True
+    finally:
+        second.terminate()
+        try:
+            second.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            second.kill()
+
+
 def test_mcp_server_speaks_stdio_and_lists_its_tools(cli_home: Path, cwd: Path) -> None:
     """Proves `mcp` (and its `version("mcp")` metadata lookup) survived freezing."""
     assert BINARY is not None

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import socket
 import threading
 
@@ -11,13 +12,30 @@ from husk_studio.ui_launcher import open_browser_at
 log = logging.getLogger(__name__)
 
 
+def _listener_answers(host: str, port: int) -> bool:
+    probe = "127.0.0.1" if host in ("", "0.0.0.0") else host
+    try:
+        with socket.create_connection((probe, port), timeout=0.25):
+            return True
+    except OSError:
+        return False
+
+
 def _port_free(host: str, port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        if os.name == "posix":
+            # Bind the way uvicorn does: sockets in TIME_WAIT from a run that just stopped
+            # (30-60 s) must not make a free port look busy. A live listener on the same
+            # address still fails the bind. Not set on Windows, where SO_REUSEADDR would let
+            # two sockets share a port and report a live listener as free.
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             s.bind((host, port))
-            return True
         except OSError:
             return False
+    # BSD/macOS let a specific bind coexist with a wildcard listener once SO_REUSEADDR is
+    # set, so also ask whether anything answers there.
+    return not (os.name == "posix" and _listener_answers(host, port))
 
 
 class PortInUseError(RuntimeError):

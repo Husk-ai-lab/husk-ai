@@ -2,6 +2,18 @@
 
 All notable changes, grouped by theme; newest first.
 
+## [Unreleased]
+
+## [0.9.2] — Husk Studio: restart on the same port — 2026-10-14
+
+### Fixed
+- **`husk-studio start --port N` no longer exits 1 right after a stop.** The pre-check bound the
+  port without `SO_REUSEADDR`, so sockets in `TIME_WAIT` from the run that just stopped (30 s on
+  macOS, 60 s on Linux) made a free port look busy, although uvicorn itself binds over them. On
+  POSIX the check now binds the way uvicorn does and still reports a live listener (including one
+  on `0.0.0.0`) as busy. Windows is unchanged. `husk-studio run` benefits the same way: a quick
+  restart no longer moves it to the next port.
+
 ## [0.9.1] — Husk Studio: rename, new palette, standalone binary, CI-built archives — 2026-10-13
 
 ### Changed

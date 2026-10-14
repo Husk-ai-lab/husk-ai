@@ -35,7 +35,7 @@ What Studio does when the shell starts it as
 
 | Input | Behaviour |
 |---|---|
-| `--port N` | **Exactly N.** If N is busy the process exits 1 with `error: port N is already in use …`. It never moves to another port. |
+| `--port N` | **Exactly N.** If N is busy the process exits 1 with `error: port N is already in use …`. It never moves to another port. "Busy" means a live listener: sockets still in `TIME_WAIT` from a run that just stopped do not count (POSIX; Windows never blocked on them), so a stop followed by an immediate start on the same port works. |
 | no `--port` | Starts on 7654; if busy, takes the next free port up to 7664 and logs `husk-studio starting on http://HOST:PORT`. The bound port is also written to `<HUSK_HOME>/port`. Interactive use only: a supervisor should always pass `--port`. |
 | `--host`, `--no-open-browser` | Honoured. |
 | `HUSK_HOME` | Honoured. The data directory (database, runs, cassettes, secrets); created if missing. |
